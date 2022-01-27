@@ -4,7 +4,7 @@ const morgan = require('morgan');
 const path = require('path');
 const cors = require('cors');
 const routes = require('./routes/index');
-const expressSession = require('express-session');
+//const expressSession = require('express-session');
 
 require('dotenv').config();
 
@@ -21,19 +21,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //Express-Session
 //Session benennen
-app.use(
-	expressSession({
-		secret: '',
-		name: '',
-		saveUninitialized: false,
-		resave: false,
-		cookie: {
-			maxAge: 2 * 1000 * 60 * 60,
-			httpOnly: false,
-			sameSite: true,
-		},
-	}),
-);
+// app.use(
+// 	expressSession({
+// 		secret: '',
+// 		name: '',
+// 		saveUninitialized: false,
+// 		resave: false,
+// 		cookie: {
+// 			maxAge: 2 * 1000 * 60 * 60,
+// 			httpOnly: false,
+// 			sameSite: true,
+// 		},
+// 	}),
+// );
 //Routen
 app.use('/', routes);
 

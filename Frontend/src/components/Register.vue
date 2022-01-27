@@ -185,15 +185,15 @@ export default {
             passwort: this.Passwort1,
             addresse: {
               Strasse: this.Strasse,
-              PLZ: this.PLZ,
+              PLZ: this.Plz,
               Ort: this.Ort,
             },
             interessen: this.interessen,
           };
 
-          // const res = await axios.post(`${this.serverAdress}/register`, kunde);
+          const res = await axios.post(`${this.serverAdress}/register`, kunde);
 
-          console.log(kunde);
+          console.log(res);
 
           this.clearFelder();
         }
