@@ -1,5 +1,5 @@
+const path = require('path');
 module.exports = {
-  transpileDependencies: [
-    'vuetify'
-  ]
-}
+	transpileDependencies: ['vuetify'],
+	outputDir: path.resolve(__dirname, '../Backend/public'),
+};
