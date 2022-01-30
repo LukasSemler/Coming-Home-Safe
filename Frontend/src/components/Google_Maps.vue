@@ -30,6 +30,7 @@ export default {
 	},
 	mounted() {
 		this.geolocate();
+		console.log(process.env.VUE_APP_GOOGLE_MAPS);
 	},
 	methods: {
 		setPlace(place) {
