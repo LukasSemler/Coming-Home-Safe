@@ -103,7 +103,7 @@
 							</v-col>
 						</v-row>
 						<v-row class="justify-center">
-							<v-col cols="8">
+							<v-col md="8">
 								<v-textarea
 									v-model="interessen"
 									solo
@@ -114,7 +114,7 @@
 							</v-col>
 						</v-row>
 						<v-row class="justify-center">
-							<v-col cols="8">
+							<v-col md="8">
 								<v-checkbox
 									v-model="datenschutz"
 									label="Akzeptieren Sie unsere Datenschutzbestimmungen"
@@ -124,7 +124,7 @@
 							</v-col>
 						</v-row>
 						<v-row class="justify-center">
-							<v-col cols="8">
+							<v-col md="8">
 								<p>
 									Sind Sie schon Registriert?
 									<span @click="changePage" class="text-decoration-underline pointer">Login</span>
