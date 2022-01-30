@@ -4,7 +4,7 @@ const morgan = require('morgan');
 const path = require('path');
 const cors = require('cors');
 const routes = require('./routes/index');
-//const expressSession = require('express-session');
+const expressSession = require('express-session');
 
 require('dotenv').config();
 
@@ -40,5 +40,5 @@ app.use('/', routes);
 //Port
 const PORT = process.env.PORT || 2410;
 app.listen(PORT, () => {
-	console.log(`Node-Server hört auf Port: ${PORT}`);
+	console.log(`Nodebackend-Server hört auf Port: ${PORT}`);
 });
