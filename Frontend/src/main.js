@@ -9,10 +9,10 @@ import * as VueGoogleMaps from 'vue2-google-maps';
 Vue.config.productionTip = false;
 
 Vue.use(VueGoogleMaps, {
-	load: {
-		key: '',
-		libraries: 'places',
-	},
+  load: {
+    key: 'AIzaSyCae4CWsdrdAYQ4LtnlX5Byhhfxfb7E5eA',
+    libraries: 'places',
+  },
 });
 
 new Vue({
