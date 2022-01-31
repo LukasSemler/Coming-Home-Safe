@@ -69,8 +69,9 @@ export default {
     },
   },
   mounted() {
-    this.track();
-    console.log(this.$store.state.currentPosition);
+    console.log('mounted Tracker');
+    console.log(`CurrPos state Mounted ${this.$store.state.currPos}`);
+    // this.track();
   },
 };
 </script>

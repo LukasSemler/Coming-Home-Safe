@@ -7,57 +7,106 @@
     </div>
     <br />
     <GmapMap :center="center" :zoom="12" style="width: 100%; height: 800px">
-      <GmapMarker
-        :key="index"
-        v-for="(m, index) in markers"
-        :position="m.position"
-        @click="center = m.position"
-      />
+      <GmapMarker :key="index" v-for="(m, index) in locations" :position="m" />
     </GmapMap>
-    {{markers}}
+
+    <hr />
+    <v-container>
+      <v-row class="justify-center">
+        <v-col md="6">
+          <v-btn class="light-blue accent-3" @click="startTracker">{{ text }}</v-btn>
+        </v-col>
+      </v-row>
+      <ul v-for="(pos, i) in loc" :key="i">
+        <li>latitude: {{ pos.lat }} longitude: {{ pos.lng }} time: {{ pos.dateTime }}</li>
+      </ul>
+    </v-container>
   </div>
 </template>
-
 <script>
 export default {
   name: 'GoogleMap',
   data() {
     return {
-      center: { lat: 48.208176, lng: 16.373819 },
+      center: {},
       currentPlace: null,
       markers: [],
-      places: [],
+      locations: [],
+      loc: [],
+
+      text: 'Start Tracker',
+      started: false,
+      interval: '',
     };
   },
   mounted() {
-    this.geolocate();
+    this.setLocationLatLng();
   },
   methods: {
-    // addMarker() {
-    //   if (this.currentPlace) {
-    //     const marker = {
-    //       lat: this.currentPlace.geometry.location.lat(),
-    //       lng: this.currentPlace.geometry.location.lng(),
-    //     };
-    //     this.markers.push({ position: marker });
-    //     this.places.push(this.currentPlace);
-    //     this.center = marker;
-    //     this.currentPlace = null;
-    //   }
-    // },
-    geolocate() {
-      if (this.$store.state.position) {
-        this.center = {
-          lat: this.$state.store.position.latitude,
-          lng: this.$state.store.position.longitude,
+    setLocationLatLng() {
+      navigator.geolocation.getCurrentPosition((geolocation) => {
+        let currPos = {
+          lat: geolocation.coords.latitude,
+          lng: geolocation.coords.longitude,
         };
 
-        const position = this.$store.state.position.map((elem) => ({
-          lat: elem.lat,
-          lng: elem.lng,
-        }));
-        this.markers.push({ position: position });
-        console.log(this.markers);
+        this.$store.state.currentPosition = currPos;
+        console.log(`Current position Google Maps = ${currPos}`);
+        this.center = currPos;
+
+        this.locations = [
+          {
+            lat: geolocation.coords.latitude,
+            lng: geolocation.coords.longitude,
+            lable: 'Current Position',
+          },
+        ];
+      });
+    },
+
+    startTracker() {
+      if (!this.started) {
+        this.started = true;
+        this.text = 'Stop Tracker';
+        this.interval = setInterval(this.track, 2000);
+      } else {
+        this.text = 'Start Tracker';
+        clearInterval(this.interval);
+      }
+    },
+    async track() {
+      let lat = '';
+      let lng = '';
+      let position = '';
+      let date = new Date();
+      // console.log(this.locations);
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+          lat = Number(pos.coords.latitude);
+          lng = Number(pos.coords.longitude);
+
+          //Object fuer DB bauen
+          position = {
+            lat,
+            lng,
+            dateTime: `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`,
+          };
+
+          this.loc.push(position); //Marker auf aktuelle position setzten
+          this.locations = [
+            {
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
+              lable: 'Current Position',
+            },
+          ];
+
+          //Axios Call Post
+          // const res = await axios.post(`${this.serverAdress}/location`, { position });
+        });
+      } else {
+        alert('Dieser Browser unterstützt die Abfrage der Geolocation nicht.');
       }
     },
   },
