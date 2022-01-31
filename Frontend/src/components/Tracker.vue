@@ -61,12 +61,16 @@ export default {
           // const res = await axios.post(`${this.serverAdress}/location`, { position });
 
           //Aktuelle Position im Store setzen
-          this.$state.store.currentPosition = position;
+          this.$store.state.currentPosition = position;
         });
       } else {
         alert('Dieser Browser unterstützt die Abfrage der Geolocation nicht.');
       }
     },
+  },
+  mounted() {
+    this.track();
+    console.log(this.$store.state.currentPosition);
   },
 };
 </script>

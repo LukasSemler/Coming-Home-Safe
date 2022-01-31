@@ -14,6 +14,7 @@
         @click="center = m.position"
       />
     </GmapMap>
+    {{markers}}
   </div>
 </template>
 
@@ -24,12 +25,11 @@ export default {
     return {
       center: { lat: 48.208176, lng: 16.373819 },
       currentPlace: null,
-      markers: [{ position: { lat: 48.208176, lng: 16.373819 } }],
+      markers: [],
       places: [],
     };
   },
   mounted() {
-    this.markers.push(this.center);
     this.geolocate();
   },
   methods: {
