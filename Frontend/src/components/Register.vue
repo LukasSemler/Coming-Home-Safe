@@ -169,7 +169,7 @@
               <v-dialog v-model="dialog" persistent max-width="500px">
                 <template v-slot:activator="{ on, attrs }">
                   <!--Register-Button-->
-                  <v-btn color="primary" v-bind="attrs" v-on="on" @click="openOTP">
+                  <v-btn color="light-blue accent-3" v-bind="attrs" v-on="on" @click="openOTP">
                     Register
                   </v-btn>
                 </template>

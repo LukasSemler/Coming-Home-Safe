@@ -1,29 +1,30 @@
 <template>
-  <div>
-    <div>
+  <v-container>
+    <v-container>
       <h2 class="text-center">Track Position</h2>
       <v-btn @click="backToMain">Back to Login/Register</v-btn>
       <!-- <GmapAutocomplete @place_changed="setPlace" />
       <button @click="addMarker">Add</button> -->
-    </div>
+    </v-container>
     <br />
     <GmapMap :center="center" :zoom="12" style="width: 100%; height: 800px">
       <GmapMarker :key="index" v-for="(m, index) in locations" :position="m" />
     </GmapMap>
 
-    <hr />
+    <br />
+    <br />
+
     <v-container>
       <v-row class="justify-center">
-        <v-col md="6">
-          <v-btn class="light-blue accent-3" @click="startTracker">{{ text }}</v-btn>
-        </v-col>
+        <v-btn class="light-blue accent-3" @click="startTracker">{{ text }}</v-btn>
       </v-row>
-      <ul v-for="(pos, i) in loc" :key="i">
-        <li>latitude: {{ pos.lat }} longitude: {{ pos.lng }} time: {{ pos.dateTime }}</li>
-      </ul>
     </v-container>
-  </div>
+    <ul v-for="(pos, i) in loc" :key="i">
+      <li>latitude: {{ pos.lat }} longitude: {{ pos.lng }} time: {{ pos.dateTime }}</li>
+    </ul>
+  </v-container>
 </template>
+
 <script>
 export default {
   name: 'GoogleMap',
