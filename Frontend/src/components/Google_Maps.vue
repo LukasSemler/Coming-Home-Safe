@@ -2,6 +2,7 @@
   <div>
     <div>
       <h2 class="text-center">Track Position</h2>
+      <v-btn @click="backToMain">Back to Login/Register</v-btn>
       <!-- <GmapAutocomplete @place_changed="setPlace" />
       <button @click="addMarker">Add</button> -->
     </div>
@@ -43,6 +44,9 @@ export default {
     this.setLocationLatLng();
   },
   methods: {
+    backToMain() {
+      this.$router.push({ name: 'Login_Register' });
+    }, //
     setLocationLatLng() {
       navigator.geolocation.getCurrentPosition((geolocation) => {
         let currPos = {

@@ -1,5 +1,7 @@
 <template>
-  <v-container> <GoogleMap /> </v-container>
+  <v-container>
+    <GoogleMap />
+  </v-container>
 </template>
 
 <script>
