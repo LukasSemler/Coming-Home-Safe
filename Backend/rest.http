@@ -1,0 +1,31 @@
+############ Authentification senden
+POST http://localhost:2410/registerGetAuth
+Content-Type: application/json
+
+{
+    "vorname": "benjamin",
+    "nachname": "stauf",
+    "email": "benjamin@stauf.at",
+    "passwort": "testPW",
+    "strasse": "Steinlegasse 38/3",
+    "ort": "Wien", 
+    "plz": 1160,  
+    "hobbysinteressen": "öasdklasödkölaskdsöakldalsöd", 
+    "geburtsdatum": "2003-10-24"
+}
+
+############## Registrieren
+POST http://localhost:2410/registerToDb
+Content-Type: application/json
+
+{
+    "vorname": "benjamin",
+    "nachname": "stauf",
+    "email": "benjamin@stauf.at",
+    "passwort": "testPW",
+    "strasse": "Steinlegasse 38/3",
+    "ort": "Wien", 
+    "plz": 1160,  
+    "hobbysinteressen": "öasdklasödkölaskdsöakldalsöd", 
+    "geburtsdatum": "2003-10-24"
+}

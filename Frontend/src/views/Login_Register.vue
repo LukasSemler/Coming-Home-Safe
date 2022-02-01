@@ -3,10 +3,13 @@
     <h1 class="text-center">Willkommen bei Coming Home Safe</h1>
     <v-btn @click="toMap">Zu der Karte</v-btn>
     <br />
+
+    <!--Register-->
     <v-container v-if="firstTime">
       <Register />
     </v-container>
 
+    <!--Login-->
     <v-container v-else>
       <Login />
     </v-container>

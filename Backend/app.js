@@ -16,29 +16,30 @@ app.use(morgan('dev'));
 app.use(express.json());
 //Cors chillt in der Middleware
 app.use(cors());
+//Statische Route
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 //Express-Session
 //Session benennen
-// app.use(
-// 	expressSession({
-// 		secret: '',
-// 		name: '',
-// 		saveUninitialized: false,
-// 		resave: false,
-// 		cookie: {
-// 			maxAge: 2 * 1000 * 60 * 60,
-// 			httpOnly: false,
-// 			sameSite: true,
-// 		},
-// 	}),
-// );
+app.use(
+  expressSession({
+    secret: 'comingHomeSave',
+    name: 'comingHomeSave',
+    saveUninitialized: false,
+    resave: false,
+    cookie: {
+      maxAge: 2 * 1000 * 60 * 60,
+      httpOnly: false,
+      sameSite: true,
+    },
+  }),
+);
 //Routen
 app.use('/', routes);
 
 //Port
 const PORT = process.env.PORT || 2410;
 app.listen(PORT, () => {
-	console.log(`Nodebackend-Server hört auf Port: ${PORT}`);
+  console.log(`Nodebackend-Server hört auf Port: ${PORT}`);
 });

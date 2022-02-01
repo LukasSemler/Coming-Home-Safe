@@ -2,29 +2,8 @@
   <v-container>
     <h2 class="text-center">Register</h2>
     <br />
-
-    <!-- <v-row justify="center">
-      <v-dialog v-model="dialog" persistent max-width="500px">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn color="primary" dark v-bind="attrs" v-on="on" @click="register"> Register </v-btn>
-        </template>
-        <v-card>
-          <v-card-title>
-            <span class="text-h5">2 Faktor Authentication</span>
-          </v-card-title>
-          <v-card-text>
-            <v-otp-input length="6" class="my-3" @finish="submit"></v-otp-input>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="red darken-1" @click="close"> Cancle </v-btn>
-            <v-btn color="green darken-1" @click="submit = false"> Submit </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </v-row> -->
-
     <v-container class="grey lighten-2 rounded-lg">
+      <!--Eingabe-Form-->
       <v-form ref="form_Register" v-model="valid" lazy-validation>
         <v-container class="d-flex flex-wrap justify-center">
           <!--Vor-Nachname- Inputs-->
@@ -123,6 +102,38 @@
                 />
               </v-col>
             </v-row>
+
+            <v-row justify="center">
+              <v-col md="8">
+                <v-dialog
+                  ref="dialog"
+                  v-model="geburtsdatumModal"
+                  :return-value.sync="geburtsdatum"
+                  persistent
+                  width="290px"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="geburtsdatum"
+                      label="Geburtsdatum"
+                      prepend-icon="mdi-calendar"
+                      readonly
+                      v-bind="attrs"
+                      v-on="on"
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker v-model="geburtsdatum" scrollable>
+                    <v-spacer></v-spacer>
+                    <v-btn text color="primary" @click="geburtsdatumModal = false"> Cancel </v-btn>
+                    <v-btn text color="primary" @click="$refs.dialog.save(geburtsdatum)">
+                      OK
+                    </v-btn>
+                  </v-date-picker>
+                </v-dialog>
+              </v-col>
+            </v-row>
+
+            <!--Interessen-->
             <v-row class="justify-center">
               <v-col md="8">
                 <v-textarea
@@ -134,6 +145,8 @@
                 ></v-textarea>
               </v-col>
             </v-row>
+
+            <!--Datenschutz-Checkbox-->
             <v-row class="justify-center">
               <v-col md="8">
                 <v-checkbox
@@ -152,13 +165,10 @@
                 </p>
               </v-col>
             </v-row>
-            <!--Submit-Bttn-->
-            <!-- <v-row class="justify-center" style="margin-top: 2rem">
-              <v-btn @click="register" class="light-blue accent-3"> Register </v-btn>
-            </v-row> -->
             <v-row justify="center">
               <v-dialog v-model="dialog" persistent max-width="500px">
                 <template v-slot:activator="{ on, attrs }">
+                  <!--Register-Button-->
                   <v-btn color="primary" v-bind="attrs" v-on="on" @click="openOTP">
                     Register
                   </v-btn>
@@ -168,10 +178,11 @@
                     <span class="text-h5">2 Faktor Authentication</span>
                   </v-card-title>
                   <v-card-text>
-                    <v-otp-input length="6" class="my-3" @finish="submit"></v-otp-input>
+                    <v-otp-input length="5" class="my-3" @finish="submitRegistration"></v-otp-input>
                   </v-card-text>
                   <v-card-actions>
                     <v-spacer></v-spacer>
+                    <v-btn color="red" @click="submitRegistration"> Submit </v-btn>
                     <v-btn color="red darken-1" @click="close"> Cancle </v-btn>
                   </v-card-actions>
                 </v-card>
@@ -203,9 +214,11 @@ export default {
       Plz: '',
       Ort: '',
       interessen: '',
+      geburtsdatum: null,
+      geburtsdatumModal: false,
       datenschutz: [],
       dialog: false,
-      otp_input: '',
+      gotAuthCode: '',
 
       //Variablen
       valid: true,
@@ -241,35 +254,55 @@ export default {
       this.dialog = false;
       this.clearFelder();
     },
-    async submit() {
-      if (this.$refs.form_Register.validate()) {
-        if (this.Passwort1 == this.Passwort2) {
-          console.log("Submit");
-
-          const kunde = {
+    async submitRegistration(otpInputCode) {
+      if (otpInputCode == this.gotAuthCode) {
+        try {
+          //User in Datenbank eintragen
+          const res = await axios.post(`${this.serverAdress}/registerToDb`, {
             vorname: this.Vorname,
             nachname: this.Nachname,
             email: this.Email,
             passwort: this.Passwort1,
-            Strasse: this.Strasse,
-            PLZ: this.Plz,
-            Ort: this.Ort,
-            interessen: this.interessen,
-          };
+            strasse: this.Strasse,
+            plz: this.Plz,
+            ort: this.Ort,
+            hobbysinteressen: this.interessen,
+            geburtsdatum: this.geburtsdatum,
+          });
 
-          // const res = await axios.post(`${this.serverAdress}/registerGetAuth`, kunde);
-
-          // console.log(res);
-
+          //Alle Inputs clearen
           this.clearFelder();
+          //Authentication-Ansicht wieder schließen
           this.dialog = false;
-          this.$router.push({name: 'Map'})
+          //Weiterleiten
+          this.$router.push({ name: 'Map' });
+        } catch (err) {
+          console.log(err);
+          this.close();
         }
       }
     },
-    openOTP() {
-      this.dialog = true;
-     
+    async openOTP() {
+      if (this.$refs.form_Register.validate()) {
+        if (this.Passwort1 == this.Passwort2) {
+          //Überprüfen ob Eingabefelder alle ausgefüllt wurden
+          let { data: code } = await axios.post('http://localhost:2410/registerGetAuth', {
+            email: this.Email,
+          });
+
+          //Überprüfen ob User nicht schon vorhanden
+          if (code != 'noUser') {
+            //Zeigt aktuellen code an
+            console.log('Code: ' + code);
+            //Authcode setzen um ihn dann zum bestäigen überprüfen zu können
+            this.gotAuthCode = code;
+            //Lässt Authcode-Ansicht öffnen
+            this.dialog = true;
+          } else {
+            alert('User ist schon vorhanden!');
+          }
+        }
+      }
     },
     clearFelder() {
       this.Vorname = null;
