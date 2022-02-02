@@ -39,10 +39,18 @@ export default {
       text: 'Start Tracker',
       started: false,
       interval: '',
+
+      ws: null,
+      ws_serverAdress: 'ws://localhost:2410',
     };
   },
   mounted() {
     this.setLocationLatLng();
+    this.ws = new WebSocket(this.ws_serverAdress);
+    this.ws.onmessage = ({ data }) => {
+      let bekommen = JSON.parse(data);
+      console.log(bekommen);
+    };
   },
   methods: {
     backToMain() {
@@ -96,7 +104,10 @@ export default {
             lat,
             lng,
             dateTime: `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`,
+            id: 1,
           };
+
+          this.ws.send(JSON.stringify(position));
 
           this.loc.push(position); //Marker auf aktuelle position setzten
           this.locations = [

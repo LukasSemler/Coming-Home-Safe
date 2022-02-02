@@ -8,6 +8,7 @@ const expressSession = require('express-session');
 
 require('dotenv').config();
 
+const { wsServer } = require('./websockets');
 //Express app
 const app = express();
 
@@ -40,6 +41,9 @@ app.use('/', routes);
 
 //Port
 const PORT = process.env.PORT || 2410;
-app.listen(PORT, () => {
+const httpServer = app.listen(PORT, () => {
   console.log(`Nodebackend-Server hört auf Port: ${PORT}`);
 });
+
+//Websocket
+wsServer(httpServer);
