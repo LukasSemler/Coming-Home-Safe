@@ -8,9 +8,14 @@
     </v-container>
     <br />
     <GmapMap :center="center" :zoom="12" style="width: 100%; height: 800px">
-      <GmapMarker :key="index" v-for="(m, index) in locations" :position="m" />
+      <GmapMarker :key="index" v-for="(m, index) in locationSingleUser" :position="m" />
     </GmapMap>
 
+    <br />
+    <h1 class="text-center" v-if="locationSingleUser.length == 0">
+      Es sind noch keine User vorhanden
+    </h1>
+    <h2 class="text-center" v-else>Aktiver User: {{ users.vorname }} {{ users.nachname }}</h2>
     <br />
     <br />
   </v-container>
@@ -37,21 +42,28 @@ export default {
       ws: null,
       ws_serverAdress: 'ws://localhost:2410',
       locationSingleUser: [],
+      users: {},
     };
   },
-  mounted() {
+  created() {
     this.ws = new WebSocket(this.ws_serverAdress);
     this.ws.onmessage = ({ data }) => {
       let bekommen = JSON.parse(data);
       console.log(bekommen);
 
-      this.locations = [
-        {
-          lat: bekommen.lat,
-          lng: bekommen.lng,
-          lable: 'Current Position User 1',
-        },
-      ];
+      if (bekommen.type == 'info') {
+        this.locationSingleUser = [];
+      } else {
+        this.users = bekommen.user;
+        this.locationSingleUser = [
+          {
+            lat: bekommen.lat,
+            lng: bekommen.lng,
+            lable: 'Current Position User 1',
+          },
+        ];
+        this.$forceUpdate();
+      }
     };
   },
   methods: {

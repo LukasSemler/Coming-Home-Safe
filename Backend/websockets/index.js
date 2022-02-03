@@ -16,7 +16,10 @@ function wsServer(httpServer) {
 
     ws.on('close', () => {
       connections = connections.filter((elem) => elem != ws);
-      console.log(connections.length);
+      console.log('User left');
+      connections.forEach((elem) =>
+        elem.send(JSON.stringify({ type: 'info', payload: 'User left' })),
+      );
     });
   });
 }

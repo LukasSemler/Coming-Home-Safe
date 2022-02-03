@@ -44,12 +44,26 @@ export default {
       ws_serverAdress: 'ws://localhost:2410',
     };
   },
+  created() {
+    window.addEventListener('beforeunload', (e) => {
+      let confirmationMessage =
+        ('Wenn Sie die Webseite verlassen, während der Tracker läuft, wird dieser beendet'(
+          e || window.event,
+        ).returnValue = confirmationMessage); //Gecko + IE
+      return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+    });
+  },
   mounted() {
     this.setLocationLatLng();
     this.ws = new WebSocket(this.ws_serverAdress);
     this.ws.onmessage = ({ data }) => {
-      let bekommen = JSON.parse(data);
-      console.log(bekommen);
+      console.log(data);
+      try {
+        let bekommen = JSON.parse(data);
+        console.log(bekommen);
+      } catch (error) {
+        console.log(error);
+      }
     };
   },
   methods: {
@@ -83,6 +97,7 @@ export default {
         this.text = 'Stop Tracker';
         this.interval = setInterval(this.track, 2000);
       } else {
+        this.started = false;
         this.text = 'Start Tracker';
         clearInterval(this.interval);
       }
@@ -105,6 +120,7 @@ export default {
             lng,
             dateTime: `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`,
             id: 1,
+            user: this.$store.state.aktiverUserTest,
           };
 
           this.ws.send(JSON.stringify(position));
