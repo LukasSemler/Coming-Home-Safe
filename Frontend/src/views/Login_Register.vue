@@ -4,14 +4,14 @@
     <!-- <v-btn @click="toMap">Zu der Karte</v-btn> -->
     <br />
 
-    <!--Register-->
-    <v-container v-if="firstTime">
-      <Register />
+    <!--Login-->
+    <v-container v-if="everLoggedIn">
+      <Login />
     </v-container>
 
-    <!--Login-->
+    <!--Register-->
     <v-container v-else>
-      <Login />
+      <Register />
     </v-container>
   </v-container>
 </template>
@@ -24,7 +24,7 @@ export default {
   name: 'Login_Register',
   data() {
     return {
-      firstTime: true,
+      everLoggedIn: false,
     };
   },
   components: {
@@ -32,17 +32,33 @@ export default {
     Register,
   },
   created() {
-    let getItem = localStorage.getItem('firstTime');
+    //Schaut im LS ob User schon mal eingeloggt war, für Seiten-Weiterleitung
+    // try {
+    //   const l = localStorage.getItem('everLoggedIn');
+    //   if (l) {
+    //     this.everLoggedIn = true;
+    //   } else {
+    //     this.everLoggedIn = false;
+    //   }
+    // } catch {
+    //   this.everLoggedIn = false;
+    // }
+
     let alreadyLogin = JSON.parse(localStorage.getItem('login'));
     if (alreadyLogin) {
-      alert(alreadyLogin)
       this.$store.state.aktiverUser = alreadyLogin;
-      this.$router.push("Map")
+      this.$router.push('Map');
     } else {
-      if (getItem != null) {
-        if (getItem == 'false') this.firstTime = false;
-        else this.firstTime = true;
-      } else console.log('Null');
+      try {
+        const l = localStorage.getItem('everLoggedIn');
+        if (l) {
+          this.everLoggedIn = true;
+        } else {
+          this.everLoggedIn = false;
+        }
+      } catch {
+        this.everLoggedIn = false;
+      }
     }
   },
   computed: {

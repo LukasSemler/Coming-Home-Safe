@@ -7,7 +7,6 @@ export default new Vuex.Store({
   state: {
     aktiverUser: null,
     currentPosition: null,
-    aktiverUser: {},
     aktiverUserTest: { vorname: 'Lukas', nachname: 'Semler', email: 'lukas.semler@gmail.com' },
   },
   mutations: {

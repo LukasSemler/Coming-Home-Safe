@@ -95,37 +95,35 @@ export default {
   },
   methods: {
     changePage() {
-      try {
-        localStorage.removeItem('firstTime');
-        localStorage.setItem('firstTime', true);
-
-        location.reload();
-      } catch (error) {
-        console.log(error);
-      }
+      localStorage.removeItem('everLoggedIn');
+      location.reload();
     },
     showPWvergessen() {},
     async submit() {
-      try {
-        let res = await axios.post('http://localhost:2410/login', {
-          email: this.email,
-          passwort: this.passwort,
-        });
-        console.log(res.data);
-        //Auf ergebnis handeln
-        if (res.status == 200) {
-          this.$store.state.aktiverUser = res.data;
-          localStorage.setItem(`login`, JSON.stringify(this.$store.state.aktiverUser));
-          //Aktiven Kunden im Store speichern
-          if (res.data.isAdmin == true) {
-          }
+      let { status, data } = await axios.post('http://localhost:2410/login', {
+        email: this.email,
+        passwort: this.passwort,
+      });
 
-          //Zur Map weiterleiten
-          this.$router.push('/map');
-        } else {
-          alert('Deine Daten sind leider Falsch');
-        }
-      } catch {
+      //User der sich einloggen will
+      let einlogUser = data;
+      console.log(einlogUser);
+
+      //Auf ergebnis handeln
+      if (status == 200) {
+        //Ever Logged-in in LS speichern
+        localStorage.setItem('everLoggedIn', true);
+
+        //Aktiven Kunden im Store speichern
+        this.$store.state.aktiverUser = data;
+        localStorage.setItem(`login`, JSON.stringify(this.$store.state.aktiverUser));
+
+        //Zur Map weiterleiten
+        this.$router.push('/map');
+      } else if (status == 200 && data.isadmin == true) {
+        //Zur Adminmap weiterleiten
+        this.$router.push('/AdminMap');
+      } else {
         alert('Deine Daten sind leider Falsch');
       }
     },

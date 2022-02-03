@@ -2,7 +2,6 @@
   <v-container>
     <v-container>
       <h2 class="text-center">Track Position</h2>
-      <v-btn @click="backToMain">Back to Login/Register</v-btn>
       <!-- <GmapAutocomplete @place_changed="setPlace" />
       <button @click="addMarker">Add</button> -->
     </v-container>

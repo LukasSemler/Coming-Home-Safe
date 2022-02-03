@@ -161,7 +161,7 @@
               <v-col md="8">
                 <p>
                   Sind Sie schon Registriert?
-                  <span @click="changePage" class="text-decoration-underline pointer">Login</span>
+                  <span @click="goToLogin()" class="text-decoration-underline pointer">Login</span>
                 </p>
               </v-col>
             </v-row>
@@ -169,9 +169,7 @@
               <v-dialog v-model="dialog" persistent max-width="500px">
                 <template v-slot:activator="{ on, attrs }">
                   <!--Register-Button-->
-                  <v-btn color="primary" v-bind="attrs" v-on="on" @click="openOTP">
-                    Register
-                  </v-btn>
+                  <v-btn color="primary" v-bind="attrs" @click="openOTP(on)"> Register </v-btn>
                 </template>
                 <v-card>
                   <v-card-title>
@@ -223,7 +221,6 @@ export default {
       //Variablen
       valid: true,
       showPasswordInput: false,
-      showAuthenticator: false,
       showAuthError: false,
       showEmailInUse: false,
 
@@ -249,6 +246,7 @@ export default {
       },
     };
   },
+
   methods: {
     close() {
       this.dialog = false;
@@ -275,32 +273,37 @@ export default {
           //Authentication-Ansicht wieder schließen
           this.dialog = false;
           //Weiterleiten
-          this.$router.push({ name: 'Map' });
+          this.$router.push('/login');
         } catch (err) {
           console.log(err);
           this.close();
         }
       }
     },
-    async openOTP() {
+    //DIALOG MACHT PROBLEME WEIL ER SICH IMMER ÖFFNET !!!!!!!!!
+    async openOTP(on) {
       if (this.$refs.form_Register.validate()) {
         if (this.Passwort1 == this.Passwort2) {
           //Überprüfen ob Eingabefelder alle ausgefüllt wurden
-          let { data: code } = await axios.post('http://localhost:2410/registerGetAuth', {
-            email: this.Email,
-            name: `${this.Vorname} ${this.Nachname}`,
-          });
+          try {
+            let { data: code, status } = await axios.post('http://localhost:2410/registerGetAuth', {
+              email: this.Email,
+              name: `${this.Vorname} ${this.Nachname}`,
+            });
 
-          //Überprüfen ob User nicht schon vorhanden
-          if (code != 'noUser') {
-            //Zeigt aktuellen code an
-            console.log('Code: ' + code);
-            //Authcode setzen um ihn dann zum bestäigen überprüfen zu können
-            this.gotAuthCode = code;
-            //Lässt Authcode-Ansicht öffnen
-            this.dialog = true;
-          } else {
-            alert('User ist schon vorhanden!');
+            //Überprüfen ob User nicht schon vorhanden
+            if (status == 200) {
+              //Zeigt aktuellen code an --> FÜR TESTZWECKE MUSS DANN WEG!!!!
+              console.log('Code: ' + code);
+              //Authcode setzen um ihn dann zum bestäigen überprüfen zu können
+              this.gotAuthCode = code;
+              //Lässt Authcode-Ansicht öffnen
+              this.dialog = true;
+            }
+          } catch {
+            alert('User bereits vorhanden!');
+            this.dialog = false;
+            this.clearFelder();
           }
         }
       }
@@ -316,18 +319,9 @@ export default {
       this.Ort = null;
       this.interessen = null;
     },
-    changePage() {
-      try {
-        localStorage.removeItem('firstTime');
-        localStorage.setItem('firstTime', false);
-
-        location.reload();
-      } catch (err) {
-        console.log('set');
-        localStorage.setItem('firstTime', false);
-
-        location.reload();
-      }
+    goToLogin() {
+      localStorage.setItem('everLoggedIn', true);
+      location.reload();
     },
   },
   computed: {
