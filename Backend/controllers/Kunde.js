@@ -39,8 +39,15 @@ const LoginHandler = (req, res) => {
   });
 };
 
+const logout = (req, res) => {
+  req.session.destroy();
+  res.clearCookie('comingHomeSave');
+  res.end();
+};
+
 module.exports = {
   SendAuthCodeHandler,
   RegisterIntoDatabase,
   LoginHandler,
+  logout,
 };

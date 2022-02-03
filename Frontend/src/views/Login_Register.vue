@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <h1 class="text-center">Willkommen bei Coming Home Safe</h1>
-    <v-btn @click="toMap">Zu der Karte</v-btn>
+    <!-- <v-btn @click="toMap">Zu der Karte</v-btn> -->
     <br />
 
     <!--Register-->
@@ -33,10 +33,17 @@ export default {
   },
   created() {
     let getItem = localStorage.getItem('firstTime');
-    if (getItem != null) {
-      if (getItem == 'false') this.firstTime = false;
-      else this.firstTime = true;
-    } else console.log('Null');
+    let alreadyLogin = JSON.parse(localStorage.getItem('login'));
+    if (alreadyLogin) {
+      alert(alreadyLogin)
+      this.$store.state.aktiverUser = alreadyLogin;
+      this.$router.push("Map")
+    } else {
+      if (getItem != null) {
+        if (getItem == 'false') this.firstTime = false;
+        else this.firstTime = true;
+      } else console.log('Null');
+    }
   },
   computed: {
     checkStatus() {},

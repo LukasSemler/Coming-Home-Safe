@@ -2,7 +2,12 @@
 const express = require('express');
 
 //Routenhandler
-const { SendAuthCodeHandler, RegisterIntoDatabase, LoginHandler } = require('../controllers/Kunde');
+const {
+  SendAuthCodeHandler,
+  RegisterIntoDatabase,
+  LoginHandler,
+  logout,
+} = require('../controllers/Kunde');
 
 //Router & Express-App
 const router = express.Router();
@@ -13,6 +18,7 @@ router.get('/', (req, res) => res.status(200).send('MainSeite!'));
 router.post('/registerGetAuth', SendAuthCodeHandler);
 router.post('/registerToDb', RegisterIntoDatabase);
 router.post('/login', LoginHandler);
+router.get('/abmelden', logout);
 
 //Export
 module.exports = router;

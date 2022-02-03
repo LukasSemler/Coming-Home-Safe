@@ -3,6 +3,7 @@ import VueRouter from 'vue-router';
 import Login_Register from '../views/Login_Register.vue';
 import Map from '../views/Maps';
 import adminMap from '../views/adminMap';
+import store from '../store';
 
 Vue.use(VueRouter);
 
@@ -17,10 +18,10 @@ const routes = [
     name: 'Map',
     component: Map,
     //Schauen ob user angemeldet ist
-    // beforeEnter: (to, from, next) => {
-    // 	if (to.query.allowed === 'true') next();
-    // 	else next('Error');
-    // },
+    beforeEnter: (to, from, next) => {
+      if (store.getters.getLogin) next();
+      else next('/');
+    },
   },
   {
     path: '/adminMap',

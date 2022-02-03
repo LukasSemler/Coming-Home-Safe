@@ -111,11 +111,14 @@ export default {
           email: this.email,
           passwort: this.passwort,
         });
-
+        console.log(res.data);
         //Auf ergebnis handeln
         if (res.status == 200) {
+          this.$store.state.aktiverUser = res.data;
+          localStorage.setItem(`login`, JSON.stringify(this.$store.state.aktiverUser));
           //Aktiven Kunden im Store speichern
-          
+          if (res.data.isAdmin == true) {
+          }
 
           //Zur Map weiterleiten
           this.$router.push('/map');
