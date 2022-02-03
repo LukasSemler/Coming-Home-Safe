@@ -169,7 +169,7 @@
               <v-dialog v-model="dialog" persistent max-width="500px">
                 <template v-slot:activator="{ on, attrs }">
                   <!--Register-Button-->
-                  <v-btn color="light-blue accent-3" v-bind="attrs" v-on="on" @click="openOTP">
+                  <v-btn color="primary" v-bind="attrs" v-on="on" @click="openOTP">
                     Register
                   </v-btn>
                 </template>
@@ -288,6 +288,7 @@ export default {
           //Überprüfen ob Eingabefelder alle ausgefüllt wurden
           let { data: code } = await axios.post('http://localhost:2410/registerGetAuth', {
             email: this.Email,
+            name: `${this.Vorname} ${this.Nachname}`,
           });
 
           //Überprüfen ob User nicht schon vorhanden

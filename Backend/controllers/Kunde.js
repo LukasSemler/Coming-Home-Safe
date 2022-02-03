@@ -1,8 +1,15 @@
-const { SendAuthCode, RegisterToDatabase } = require('../globaleDinge');
+const { SendAuthCode, RegisterToDatabase, SendAuthCodePerMail, Login } = require('../globaleDinge');
 
 //Kunden den Auth-Code senden
 const SendAuthCodeHandler = (req, res) => {
-  SendAuthCode(req.body).then((code) => {
+  //Email aus übergabe rausziehen
+  const { email, name } = req.body;
+
+  //Vom Server den Auth-Code erhalten und Email schicken
+  SendAuthCode(email).then((code) => {
+    //Email mit Code an User senden
+    SendAuthCodePerMail(code, email, name);
+    //Serverstatus und code ausgeben
     code != 'noUser' ? res.status(200).send(code) : res.status(400).send('User bereits vorhanden!');
   });
 };
@@ -21,7 +28,19 @@ const RegisterIntoDatabase = (req, res) => {
   }
 };
 
+const LoginHandler = (req, res) => {
+  const data = req.body;
+  Login(data).then((returnedKunde) => {
+    if (returnedKunde != 'Kein Kunde') {
+      res.status(200).json(returnedKunde);
+    } else {
+      res.status(400).send('Kein Kunde');
+    }
+  });
+};
+
 module.exports = {
   SendAuthCodeHandler,
   RegisterIntoDatabase,
+  LoginHandler,
 };

@@ -5,10 +5,10 @@ const path = require('path');
 const cors = require('cors');
 const routes = require('./routes/index');
 const expressSession = require('express-session');
+let { wsServer } = require('./websockets');
 
 require('dotenv').config();
 
-const { wsServer } = require('./websockets');
 //Express app
 const app = express();
 
@@ -40,10 +40,11 @@ app.use(
 app.use('/', routes);
 
 //Port
-const PORT = process.env.PORT || 2410;
+const PORT = process.env.PORT || 3000;
+
 const httpServer = app.listen(PORT, () => {
   console.log(`Nodebackend-Server hört auf Port: ${PORT}`);
 });
 
-//Websocket
+//Websockets zuweisen
 wsServer(httpServer);

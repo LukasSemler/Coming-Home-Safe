@@ -1,8 +1,15 @@
-const { Pool, Client } = require('pg');
+//Importe
+require('dotenv').config();
+const { Pool } = require('pg');
+const path = require('path');
 const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
+const hbs = require('nodemailer-express-handlebars');
+const { google } = require('googleapis');
+const OAuth2 = google.auth.OAuth2;
 
 //Account
-const credentials = {
+const psqlCredentials = {
   user: 'postgres',
   host: 'localhost',
   database: 'cominghomesafe',
@@ -10,22 +17,57 @@ const credentials = {
   port: 5432,
 };
 
-//Wichtige Variablen
+//#region -----------WICHTIGE VARIABLEN-----------
+
 let aktiverClient;
 
-//Verbinden
+//GoogleService für Email
+const oauth2Client = new OAuth2(
+  process.env.CLIENTID,
+  process.env.CLIENTSECRET,
+  'https://developers.google.com/oauthplayground',
+);
 
-//------------Offizielle Funktionen-----------------
+oauth2Client.setCredentials({
+  refresh_token: process.env.REFRESH_TOKEN,
+});
+
+const accessToken = oauth2Client.getAccessToken();
+
+const smtpTransport = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    type: 'OAuth2',
+    user: 'comingHomeSafe.HTLWW@gmail.com',
+    clientId: process.env.CLIENTID,
+    clientSecret: process.env.CLIENTSECRET,
+    refreshToken: process.env.REFRESH_TOKEN,
+    accessToken: accessToken,
+  },
+  tls: {
+    rejectUnauthorized: false,
+  },
+});
+
+//#endregion
+
+//#region -----------Offizielle Funktionen-----------
+
+//Datenbankverbindung herstellen
 function DatenbankVerbinden() {
-  aktiverClient = new Pool(credentials);
+  aktiverClient = new Pool(psqlCredentials);
   aktiverClient.connect();
+
+  //Testquery-Pool
 }
 
-//Trennen
+//Datenbankverbindung schließen
 function DatenbankTrennen() {
   aktiverClient.end();
+  aktiverClient = null;
 }
 
+//Generiert einen Authentifikations-Code
 let makeAuthCode = () => {
   let code = '';
   let auswahl = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -40,7 +82,7 @@ let makeAuthCode = () => {
 
 //--------Register--------
 //Authentifakationscode generieren & senden
-async function SendAuthCode({ email }) {
+async function SendAuthCode(email) {
   //Datenbankverbindung aufbauen
   DatenbankVerbinden();
 
@@ -48,9 +90,6 @@ async function SendAuthCode({ email }) {
   let res = await aktiverClient.query('SELECT * FROM kunde WHERE email = $1', [email]);
   //Wenn Kunde noch nicht vorhanden
   if (!res.rows[0]) {
-    //Email mit dem Code senden
-    // SendAuthCodePerMail()
-
     //Datenbankverbindung trennen
     DatenbankTrennen();
 
@@ -63,6 +102,44 @@ async function SendAuthCode({ email }) {
     //Code zurückgeben
     return 'noUser';
   }
+}
+
+async function SendAuthCodePerMail(genCode, empfängerMail, name) {
+  //Nodemailer smtpTransport erstellen
+
+  //Configure Handlebar ------> PFAD MACHT PROBLEME!!!!!
+  const handlebarOptions = {
+    viewEngine: {
+      extName: '.handlebars',
+      partialsDir: path.resolve(__dirname, 'controllers', 'templateViews'),
+      defaultLayout: false,
+    },
+    viewPath: path.resolve('./controllers/templateViews/'),
+    extName: '.handlebars',
+  };
+
+  //smtpTransport soll Handlebars verwenden
+  smtpTransport.use('compile', hbs(handlebarOptions));
+
+  // Mail options
+  let mailoptions = {
+    from: 'comingHomeSafe.HTLWW@gmail.com',
+    to: empfängerMail,
+    // to: "benjamin.stauf11@gmail.com",
+    subject: 'Verifizierung',
+    //Einbindung von Handlebars
+    template: 'authentification',
+    context: {
+      Name: name,
+      Code: genCode,
+    },
+  };
+
+  //Email senden
+  smtpTransport.sendMail(mailoptions, (error, response) => {
+    error ? console.log(error) : console.log(response);
+    smtpTransport.close();
+  });
 }
 
 //Registrieren
@@ -95,11 +172,33 @@ async function RegisterToDatabase({
 
 //--------Login----------
 async function Login({ email, passwort }) {
-  
+  //Datenbankverbindung herstellen
+  DatenbankVerbinden();
+
+  //Schauen ob Kunde existiert und gibt kunde zurück
+  let { rows } = await aktiverClient.query(
+    'SELECT * FROM kunde WHERE email = $1 AND passwort = $2',
+    [email, passwort],
+  );
+
+  let gefundenenKunde = rows[0];
+  if (gefundenenKunde) {
+    //Datenbankverbindung trennen
+    DatenbankTrennen();
+    return gefundenenKunde;
+  } else {
+    //Datenbankverbindung trennen
+    DatenbankTrennen();
+    return 'Kein Kunde';
+  }
 }
+
+//#endregion
 
 //Exporte
 module.exports = {
   SendAuthCode,
   RegisterToDatabase,
+  SendAuthCodePerMail,
+  Login,
 };
