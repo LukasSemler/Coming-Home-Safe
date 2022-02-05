@@ -24,7 +24,7 @@ const RegisterIntoDatabase = (req, res) => {
 		});
 	} catch (err) {
 		if (err) console.log(err);
-		res.status(400).send(err);
+		res.status(404).send(err);
 	}
 };
 

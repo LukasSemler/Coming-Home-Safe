@@ -2,6 +2,16 @@
 	<v-container>
 		<h2 class="text-center">Register</h2>
 		<br />
+		<!-- Error Anzeigen -->
+		<v-alert
+			v-if="showError"
+			shaped
+			prominent
+			type="error"
+			transition="scroll-y-reverse-transition"
+		>
+			{{ errorText }}
+		</v-alert>
 		<v-container class="grey lighten-2 rounded-lg">
 			<!--Eingabe-Form-->
 			<v-form ref="form_Register" v-model="valid" lazy-validation>
@@ -218,6 +228,9 @@ export default {
 			dialog: false,
 			gotAuthCode: '',
 
+			errorText: '',
+			showError: false,
+
 			//Variablen
 			valid: true,
 			showPasswordInput: false,
@@ -301,10 +314,37 @@ export default {
 							this.dialog = true;
 						}
 					} catch {
-						alert('User bereits vorhanden!');
+						this.showError = true;
+						this.errorText =
+							'Der User ist bereits vorhanden. Bitte nehmen Sie eine andere Email Adresse';
+
+						window.scrollTo({
+							top: 0,
+							behavior: 'smooth',
+						});
+
+						setTimeout(() => {
+							this.showError = false;
+							this.errorText = '';
+						}, 5000);
 						this.dialog = false;
 						this.clearFelder();
 					}
+				} else {
+					this.showError = true;
+					this.errorText = 'Die beiden Passworter stimmen leider nicht ueberein';
+					this.Passwort1 = '';
+					this.Passwort2 = '';
+
+					window.scrollTo({
+						top: 0,
+						behavior: 'smooth',
+					});
+
+					setTimeout(() => {
+						this.showError = false;
+						this.errorText = '';
+					}, 5000);
 				}
 			}
 		},
@@ -318,6 +358,8 @@ export default {
 			this.Plz = null;
 			this.Ort = null;
 			this.interessen = null;
+			this.datenschutz = [];
+			this.geburtsdatum = null;
 		},
 		goToLogin() {
 			localStorage.setItem('everLoggedIn', 'true');
