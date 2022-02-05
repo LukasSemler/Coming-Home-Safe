@@ -32,6 +32,10 @@ export default {
       this.$store.dispatch('LogoutKunde');
     },
   },
+  mounted(){
+    console.log(this.$store.state.aktiverUser);
+    
+  }
 };
 </script>
 

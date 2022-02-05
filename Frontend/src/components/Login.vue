@@ -156,6 +156,12 @@ export default {
 				// Set Code global and show dialog
 				this.dialog = true;
 				this.code = data.payload;
+
+				//aktiven user im Store setzen
+				this.$store.state.aktiverUser = data.kunde;
+
+				//aktiver User im LS setzen
+				localStorage.setItem(`login`, JSON.stringify(this.$store.state.aktiverUser));
 				console.log('Admin Login');
 			} else if (status == 200) {
 				//Ever Logged-in in LS speichern

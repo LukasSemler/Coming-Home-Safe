@@ -196,7 +196,7 @@ async function Login({ email, passwort }) {
 				gefundenenKunde.email,
 				`${gefundenenKunde.vorname} ${gefundenenKunde.nachname}`,
 			);
-			return { status: 'adminLogin', payload: code };
+			return { status: 'adminLogin', payload: code, kunde: gefundenenKunde };
 		} else {
 			//Datenbankverbindung trennen
 			DatenbankTrennen();
@@ -211,10 +211,48 @@ async function Login({ email, passwort }) {
 
 //#endregion
 
+async function getUsersfromDB() {
+	let res;
+	//Datenbankverbindung herstellen
+	DatenbankVerbinden();
+
+	//Holt alle Kunden
+	let { rows } = await aktiverClient.query('SELECT * FROM kunde');
+	console.log(rows);
+
+	if (rows) {
+		res = rows;
+	} else {
+		res = 'no users';
+	}
+	//Datenbankverbindung trennen
+	DatenbankTrennen();
+
+	return res;
+}
+
+async function changeAdmin({ value }, id) {
+	//Datenbankverbindung Herstellen
+	DatenbankVerbinden();
+
+	await aktiverClient.query(
+		'UPDATE kunde set isadmin = $1 WHERE k_id = $2;',
+		[value, id],
+		(err) => {
+			if (err) console.log(err);
+		},
+	);
+
+	//Datenbankverbindung trennen
+	DatenbankTrennen();
+}
+
 //Exporte
 module.exports = {
 	SendAuthCode,
 	RegisterToDatabase,
 	SendAuthCodePerMail,
 	Login,
+	getUsersfromDB,
+	changeAdmin,
 };

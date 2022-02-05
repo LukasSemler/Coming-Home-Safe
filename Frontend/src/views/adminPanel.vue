@@ -1,6 +1,6 @@
 <template>
 	<v-container>
-		<h1 class="text-center">AdminpPanel View</h1>
+		<h1 class="text-center">AdminPanel View</h1>
 		<br />
 		<adminPanel />
 	</v-container>
@@ -9,7 +9,7 @@
 <script>
 import adminPanel from '../components/adminPanel';
 export default {
-	name: 'Admin Panel',
+	name: 'AdminPanel',
 	components: { adminPanel },
 	data() {
 		return {};

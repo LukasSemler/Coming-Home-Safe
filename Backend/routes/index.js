@@ -3,10 +3,12 @@ const express = require('express');
 
 //Routenhandler
 const {
-  SendAuthCodeHandler,
-  RegisterIntoDatabase,
-  LoginHandler,
-  logout,
+	SendAuthCodeHandler,
+	RegisterIntoDatabase,
+	LoginHandler,
+	logout,
+	getUsers,
+  patchAdmin
 } = require('../controllers/Kunde');
 
 //Router & Express-App
@@ -19,6 +21,9 @@ router.post('/registerGetAuth', SendAuthCodeHandler);
 router.post('/registerToDb', RegisterIntoDatabase);
 router.post('/login', LoginHandler);
 router.get('/abmelden', logout);
+
+router.get('/getUsers', getUsers);
+router.patch('/patchAdmin/:id', patchAdmin)
 
 //Export
 module.exports = router;

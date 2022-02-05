@@ -47,6 +47,10 @@ export default {
 		let alreadyLogin = JSON.parse(localStorage.getItem('login'));
 		if (alreadyLogin) {
 			this.$store.state.aktiverUser = alreadyLogin;
+			//check if Admin -> admin Map
+			if (this.$store.state.aktiverUser.isadmin) {
+				this.$router.push('adminMap');
+			}
 			this.$router.push('Map');
 		} else {
 			try {

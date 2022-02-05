@@ -1,4 +1,11 @@
-const { SendAuthCode, RegisterToDatabase, SendAuthCodePerMail, Login } = require('../globaleDinge');
+const {
+	SendAuthCode,
+	RegisterToDatabase,
+	SendAuthCodePerMail,
+	Login,
+	getUsersfromDB,
+	changeAdmin,
+} = require('../globaleDinge');
 
 //Kunden den Auth-Code senden
 const SendAuthCodeHandler = (req, res) => {
@@ -47,9 +54,28 @@ const logout = (req, res) => {
 	res.end();
 };
 
+const getUsers = async (req, res) => {
+	const erg = await getUsersfromDB();
+	console.log(erg);
+
+	if (erg != 'no users') res.status(200).json(erg);
+	else res.status(404).send('Es wurden keine user gefunden');
+};
+
+const patchAdmin = async (req, res) => {
+	const value = req.body;
+	const id = req.params.id;
+
+	console.log(`ID: ${id}, Wert: ${value}`);
+
+	await changeAdmin(value, id);
+};
+
 module.exports = {
 	SendAuthCodeHandler,
 	RegisterIntoDatabase,
 	LoginHandler,
 	logout,
+	getUsers,
+	patchAdmin,
 };
