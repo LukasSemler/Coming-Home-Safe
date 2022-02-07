@@ -1,81 +1,103 @@
 const {
-	SendAuthCode,
-	RegisterToDatabase,
-	SendAuthCodePerMail,
-	Login,
-	getUsersfromDB,
-	changeAdmin,
+  SendAuthCode,
+  RegisterToDatabase,
+  SendAuthCodePerMail,
+  Login,
+  getUsersfromDB,
+  changeAdmin,
 } = require('../globaleDinge');
 
 //Kunden den Auth-Code senden
-const SendAuthCodeHandler = (req, res) => {
-	//Email aus übergabe rausziehen
-	const { email, name } = req.body;
+const SendAuthCodeHandler = async (req, res) => {
+  //Email aus übergabe rausziehen
+  const { email, name } = req.body;
 
-	//Vom Server den Auth-Code erhalten und Email schicken
-	SendAuthCode(email).then((code) => {
-		//Email mit Code an User senden
-		SendAuthCodePerMail(code, email, name);
-		//Serverstatus und code ausgeben
-		code != 'noUser' ? res.status(200).send(code) : res.status(400).send('User bereits vorhanden!');
-	});
+  //Vom Server den Auth-Code erhalten und Email schicken
+  let code = await SendAuthCode(email);
+
+  //Email mit Code an User senden
+  if (code != 'noUser') {
+    //Email an den User senden
+    SendAuthCodePerMail(code, email, name);
+    //Status an den axios call
+    res.status(200).send(code);
+  } else {
+    res.status(400).send('User bereits vorhanden!');
+  }
 };
 
 //Kunden registrieren
-const RegisterIntoDatabase = (req, res) => {
-	let data = req.body;
-	try {
-		//Eintrag in die Datenbank
-		RegisterToDatabase(data).then((value) => {
-			res.status(200).send(value);
-		});
-	} catch (err) {
-		if (err) console.log(err);
-		res.status(404).send(err);
-	}
+const RegisterIntoDatabaseHandler = async (req, res) => {
+  let data = req.body;
+  //Eintrag in die Datenbank
+  try {
+    //User wird in die DB eigetragen
+    await RegisterToDatabase(data);
+    //Status an axios senden
+    res.status(200);
+  } catch (err) {
+    console.log(err);
+    res.status(404).send(err);
+  }
 };
 
-const LoginHandler = (req, res) => {
-	const data = req.body;
-	Login(data).then((returnedKunde) => {
-		if (returnedKunde.status != 'Kein Kunde') {
-			res.status(200).json(returnedKunde);
-		} else if (returnedKunde.status == 'adminLogin') {
-			res.status(200).json(returnedKunde);
-		} else {
-			res.status(404).send('Kein Kunde');
-		}
-	});
+const LoginHandler = async (req, res) => {
+  const data = req.body;
+
+  //Sucht Kunden in der Datenbank und gibt ihn zurück
+  let returnedKunde = await Login(data);
+
+  //Wenn keine User gefunden wurde nix schicken
+  if (returnedKunde == 'no User found') {
+    //Wenn kein User gefunden
+    res.status(404).send('Kein Kunde');
+  }
+  //Wenn Kunde gefunden
+  else {
+    //Schauen ob Kunde ein Admin ist
+    if (returnedKunde.isadmin) {
+      //Code generieren
+      let code = await SendAuthCode(returnedKunde.email, true);
+      //Code per Mail senden
+      SendAuthCodePerMail(code, returnedKunde.email);
+      //Axios status setzen + Code und gefundenen User zurückgeben
+      res.status(200).send(JSON.stringify({ foundUser: returnedKunde, code: code }));
+    }
+    //Wenn Kunde kein Admin ist
+    else {
+      //Axios status setzen + Code und gefundenen User zurückgeben
+      res.status(200).send(JSON.stringify({ foundUser: returnedKunde, code: 'kein Admin' }));
+    }
+  }
 };
 
-const logout = (req, res) => {
-	req.session.destroy();
-	res.clearCookie('comingHomeSave');
-	res.end();
+//User loggt sich aus
+const LogoutHandler = (req, res) => {
+  req.session.destroy();
+  res.clearCookie('comingHomeSave');
+  res.end();
 };
 
-const getUsers = async (req, res) => {
-	const erg = await getUsersfromDB();
-	console.log(erg);
+const getUsersHandler = async (req, res) => {
+  const erg = await getUsersfromDB();
 
-	if (erg != 'no users') res.status(200).json(erg);
-	else res.status(404).send('Es wurden keine user gefunden');
+  if (erg != 'no users') res.status(200).json(erg);
+  else res.status(404).send('Es wurden keine user gefunden');
 };
 
-const patchAdmin = async (req, res) => {
-	const value = req.body;
-	const id = req.params.id;
+//Hier kann man übers Adminpanel den Adminstatus ändern
+const PatchAdminHandler = async (req, res) => {
+  const value = req.body;
+  const id = req.params.id;
 
-	console.log(`ID: ${id}, Wert: ${value}`);
-
-	await changeAdmin(value, id);
+  await changeAdmin(value, id);
 };
 
 module.exports = {
-	SendAuthCodeHandler,
-	RegisterIntoDatabase,
-	LoginHandler,
-	logout,
-	getUsers,
-	patchAdmin,
+  SendAuthCodeHandler,
+  RegisterIntoDatabaseHandler,
+  LoginHandler,
+  LogoutHandler,
+  getUsersHandler,
+  PatchAdminHandler,
 };

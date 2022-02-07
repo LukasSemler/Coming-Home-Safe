@@ -36,7 +36,9 @@ export default {
 			//Kunden aus Store löschen
 			this.$store.dispatch('LogoutKunde');
 		},
-		changeAdminPanel() {},
+		changeAdminPanel() {
+			this.$router.push("/adminPanel")
+		},
 	},
 	created() {
 		let alreadyLogin = JSON.parse(localStorage.getItem('login'));

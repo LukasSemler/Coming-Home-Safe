@@ -6,6 +6,7 @@
       </v-col>
     </v-row>
 
+    <!--Google Maps Component-->
     <GoogleMap />
   </v-container>
 </template>
@@ -32,10 +33,9 @@ export default {
       this.$store.dispatch('LogoutKunde');
     },
   },
-  mounted(){
+  mounted() {
     console.log(this.$store.state.aktiverUser);
-    
-  }
+  },
 };
 </script>
 
