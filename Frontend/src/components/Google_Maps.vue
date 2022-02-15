@@ -56,7 +56,7 @@ export default {
 		this.setLocationLatLng();
 		this.ws = new WebSocket(this.ws_serverAdress);
 		this.ws.onmessage = ({ data }) => {
-			console.log(data);
+			// console.log(data);
 			try {
 				let bekommen = JSON.parse(data);
 				console.log(bekommen);

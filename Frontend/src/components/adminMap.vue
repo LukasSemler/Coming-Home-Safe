@@ -72,6 +72,7 @@ export default {
 		this.ws = new WebSocket(this.ws_serverAdress);
 		this.ws.onmessage = ({ data }) => {
 			let bekommen = JSON.parse(data);
+      console.log(bekommen);
 			this.currentPos = bekommen;
 
 			if (bekommen.type == 'info') {

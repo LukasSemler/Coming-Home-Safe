@@ -269,7 +269,7 @@ export default {
       if (otpInputCode == this.gotAuthCode) {
         try {
           //User in Datenbank eintragen
-          const res = await axios.post(`${this.serverAdress}/registerToDb`, {
+          await axios.post(`${this.serverAdress}/registerToDb`, {
             vorname: this.Vorname,
             nachname: this.Nachname,
             email: this.Email,
@@ -281,16 +281,18 @@ export default {
             geburtsdatum: this.geburtsdatum,
           });
 
-          //Alle Inputs clearen
-          this.clearFelder();
-          //Authentication-Ansicht wieder schließen
-          this.dialog = false;
-          //Weiterleiten
-          // this.$router.push('');
+          //Alle Inputs clearen & OTP-Input-Dialog zumachen
+          this.close();
+
+          //Weiterleiten zum Login
+          this.goToLogin();
+          location.reload();
         } catch (err) {
           console.log(err);
           this.close();
         }
+      } else {
+        alert('Fehler im submitRegistration!');
       }
     },
     //DIALOG MACHT PROBLEME WEIL ER SICH IMMER ÖFFNET !!!!!!!!!
@@ -361,7 +363,7 @@ export default {
       this.datenschutz = [];
       this.geburtsdatum = null;
     },
-    
+
     goToLogin() {
       localStorage.setItem('everLoggedIn', 'true');
       location.reload();

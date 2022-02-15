@@ -1,7 +1,16 @@
 <template>
   <v-container>
     <h2 class="text-center">Login</h2>
-
+    <br />
+    <v-alert
+      v-if="showError"
+      shaped
+      prominent
+      type="error"
+      transition="scroll-y-reverse-transition"
+    >
+      {{ errorText }}
+    </v-alert>
     <v-dialog v-model="dialog" persistent max-width="500px">
       <!-- <template v-slot:activator="{ on, attrs }">
 				Register-Button
@@ -101,6 +110,9 @@ export default {
       code: '',
       foundUser: null,
 
+      errorText: '',
+      showError: false,
+
       rules: {
         required: [(val) => (val || '').length > 0 || 'This field is required'],
         EmailRules: [
@@ -159,16 +171,16 @@ export default {
     },
 
     async submit() {
-      //Bekommt daten vom server (Gefundenen User und Code)
-      let { status, data } = await axios.post('http://localhost:2410/login', {
-        email: this.email,
-        passwort: this.passwort,
-      });
-
-      const { code, foundUser } = data;
-
       //Schaut ob der User ein Admin ist oder nicht, für richtige Weiterleitung (Map oder Adminmap)
       try {
+        //Bekommt daten vom server (Gefundenen User und Code)
+        let { status, data } = await axios.post('http://localhost:2410/login', {
+          email: this.email,
+          passwort: this.passwort,
+        });
+
+        const { code, foundUser } = data;
+
         //Normaler User
         if (status == 200 && code == 'kein Admin') {
           //Ever logged-in im LS speichern
@@ -194,7 +206,21 @@ export default {
         }
       } catch {
         //Wenn user nicht vorhanden kommt ein alert
-        alert('Daten sind leider falsch!');
+        this.showError = true;
+        this.errorText =
+          'Der User ist leider nicht vorhanden. Bitte erstellen Sie einen Account oder geben Sie die richtigen Daten an.';
+
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        });
+
+        setTimeout(() => {
+          this.showError = false;
+          this.errorText = '';
+        }, 5000);
+
+        this.clearFelder();
       }
     },
   },
