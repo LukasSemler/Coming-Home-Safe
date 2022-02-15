@@ -55,7 +55,8 @@ export default {
   mounted() {
     this.setLocationLatLng();
 
-    let HOST = location.origin.replace(/^https/, 'ws');
+    //Websockets funkionieren nur auf Heroku nicht auf localhost
+    let HOST = location.origin.replace(/^https/, 'wss');
     this.ws = new WebSocket(HOST);
     this.ws.onmessage = ({ data }) => {
       // console.log(data);
