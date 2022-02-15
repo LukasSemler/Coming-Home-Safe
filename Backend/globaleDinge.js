@@ -41,7 +41,7 @@ const smtpTransport = nodemailer.createTransport({
   },
 });
 
-//DB-Account
+//DB-Account brauchen wir nur noch für Datagrip
 // const psqlCredentials = {
 //   user: 'vawourouomrsit',
 //   host: 'ec2-18-203-64-130.eu-west-1.compute.amazonaws.com',
@@ -49,20 +49,28 @@ const smtpTransport = nodemailer.createTransport({
 //   password: 'a385457ff7597ae26f0fba6dc4c27be706398a8b14543889762d04137aeae620',
 //   port: 5432,
 // };
-const psqlCredentials = {
-    user: 'postgres',
-    host: 'localhost',
-    database: 'cominghomesafe',
-    password: 'postgres',
-    port: 5432,
-  };
-
 //#endregion
 
 //#region -----------Offizielle Funktionen-----------
 //Datenbankverbindung herstellen
 function DatenbankVerbinden() {
-  aktiverClient = new Pool(psqlCredentials);
+  // //Development
+  // aktiverClient = new Pool({
+  //   user: 'postgres',
+  //   host: 'localhost',
+  //   database: 'cominghomesafe',
+  //   password: 'postgres',
+  //   port: 5432,
+  // });
+
+  //Production
+  aktiverClient = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false,
+    },
+  });
+
   aktiverClient.connect();
 
   //Testquery-Pool
