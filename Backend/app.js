@@ -5,6 +5,7 @@ const path = require('path');
 const cors = require('cors');
 const routes = require('./routes/index');
 const expressSession = require('express-session');
+const colors = require("colors")
 let { wsServer } = require('./websockets');
 
 require('dotenv').config();
@@ -43,7 +44,10 @@ app.use('/', routes);
 const PORT = process.env.PORT || 3000;
 
 const httpServer = app.listen(PORT, () => {
-  console.log(`Nodebackend-Server hört auf Port: ${PORT}`);
+  // console.clear();
+  console.log(`|---------------------------------------|`.magenta);
+  console.log(` Nodebackend-Server hört auf Port: `.rainbow, `${PORT}`.green);
+  console.log(`|---------------------------------------|`.magenta);
 });
 
 //Websockets zuweisen

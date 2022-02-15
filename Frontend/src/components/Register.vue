@@ -301,7 +301,7 @@ export default {
         if (this.Passwort1 == this.Passwort2) {
           //Überprüfen ob Eingabefelder alle ausgefüllt wurden
           try {
-            let { data: code, status } = await axios.post('http://localhost:2410/registerGetAuth', {
+            let { data: code, status } = await axios.post(`${this.serverAdress}/registerGetAuth`, {
               email: this.Email,
               name: `${this.Vorname} ${this.Nachname}`,
             });

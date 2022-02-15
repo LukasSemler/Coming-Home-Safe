@@ -42,13 +42,20 @@ const smtpTransport = nodemailer.createTransport({
 });
 
 //DB-Account
+// const psqlCredentials = {
+//   user: 'vawourouomrsit',
+//   host: 'ec2-18-203-64-130.eu-west-1.compute.amazonaws.com',
+//   database: 'ddphhp999e8mja',
+//   password: 'a385457ff7597ae26f0fba6dc4c27be706398a8b14543889762d04137aeae620',
+//   port: 5432,
+// };
 const psqlCredentials = {
-  user: 'postgres',
-  host: 'localhost',
-  database: 'cominghomesafe',
-  password: 'postgres',
-  port: 5432,
-};
+    user: 'postgres',
+    host: 'localhost',
+    database: 'cominghomesafe',
+    password: 'postgres',
+    port: 5432,
+  };
 
 //#endregion
 
