@@ -171,7 +171,7 @@
               <v-col md="8">
                 <p>
                   Sind Sie schon Registriert?
-                  <span @click="goToLogin()" class="text-decoration-underline pointer">Login</span>
+                  <span @click="goToLogin" class="text-decoration-underline pointer">Login</span>
                 </p>
               </v-col>
             </v-row>
@@ -261,15 +261,29 @@ export default {
   },
 
   methods: {
+    clearFelder() {
+      this.Vorname = null;
+      this.Nachname = null;
+      this.Email = null;
+      this.Passwort1 = null;
+      this.Passwort2 = null;
+      this.Strasse = null;
+      this.Plz = null;
+      this.Ort = null;
+      this.interessen = null;
+      this.datenschutz = [];
+      this.geburtsdatum = null;
+    },
     close() {
       this.dialog = false;
       this.clearFelder();
     },
-    async submitRegistration(otpInputCode) {
-      if (otpInputCode == this.gotAuthCode) {
+
+    submitRegistration(passwordOTP_INPUT) {
+      if (passwordOTP_INPUT == this.gotAuthCode) {
         try {
           //User in Datenbank eintragen
-          await axios.post(`${this.serverAdress}/registerToDb`, {
+          axios.post(`${this.serverAdress}/registerToDb`, {
             vorname: this.Vorname,
             nachname: this.Nachname,
             email: this.Email,
@@ -288,7 +302,9 @@ export default {
           this.goToLogin();
           location.reload();
         } catch (err) {
-          console.log(err);
+          console.log(
+            'Fehler beim Eintragen des Kunden in die Datenbank (Frontend in submitRegistration)',
+          );
           this.close();
         }
       } else {
@@ -334,7 +350,7 @@ export default {
           }
         } else {
           this.showError = true;
-          this.errorText = 'Die beiden Passworter stimmen leider nicht ueberein';
+          this.errorText = 'Die beiden Passworter stimmen leider nicht überein';
           this.Passwort1 = '';
           this.Passwort2 = '';
 
@@ -349,19 +365,6 @@ export default {
           }, 5000);
         }
       }
-    },
-    clearFelder() {
-      this.Vorname = null;
-      this.Nachname = null;
-      this.Email = null;
-      this.Passwort1 = null;
-      this.Passwort2 = null;
-      this.Strasse = null;
-      this.Plz = null;
-      this.Ort = null;
-      this.interessen = null;
-      this.datenschutz = [];
-      this.geburtsdatum = null;
     },
 
     goToLogin() {

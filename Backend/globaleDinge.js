@@ -55,21 +55,21 @@ const smtpTransport = nodemailer.createTransport({
 //Datenbankverbindung herstellen
 function DatenbankVerbinden() {
   // //Development
-  // aktiverClient = new Pool({
-  //   user: 'postgres',
-  //   host: 'localhost',
-  //   database: 'cominghomesafe',
-  //   password: 'postgres',
-  //   port: 5432,
-  // });
+  aktiverClient = new Pool({
+    user: 'postgres',
+    host: 'localhost',
+    database: 'cominghomesafe',
+    password: 'postgres',
+    port: 5432,
+  });
 
   //Production
-  aktiverClient = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-      rejectUnauthorized: false,
-    },
-  });
+  // aktiverClient = new Pool({
+  //   connectionString: process.env.DATABASE_URL,
+  //   ssl: {
+  //     rejectUnauthorized: false,
+  //   },
+  // });
 
   aktiverClient.connect();
 
