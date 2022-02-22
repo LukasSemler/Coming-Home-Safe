@@ -25,8 +25,9 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
-  name: 'GoogleMap',
+  name: 'userMap',
   data() {
     return {
       center: {},
@@ -41,6 +42,8 @@ export default {
 
       ws: null,
       ws_serverAdress: 'ws://localhost:2410',
+
+      apiKey: process.env.VUE_APP_GEOCODING,
     };
   },
   created() {
@@ -56,8 +59,8 @@ export default {
     this.setLocationLatLng();
 
     //Websockets funkionieren nur auf Heroku nicht auf localhost
-    let HOST = location.origin.replace(/^https/, 'wss');
-    this.ws = new WebSocket(HOST);
+    // let HOST = location.origin.replace(/^https/, 'wss');
+    this.ws = new WebSocket(this.ws_serverAdress);
     this.ws.onmessage = ({ data }) => {
       // console.log(data);
       try {
@@ -116,6 +119,11 @@ export default {
           lat = Number(pos.coords.latitude);
           lng = Number(pos.coords.longitude);
 
+          const { data } = await axios.get(
+            `https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lng}&apiKey=${this.apiKey}`,
+          );
+          // console.log(data.features[0].properties);
+
           //Object fuer DB bauen
           position = {
             lat,
@@ -123,6 +131,7 @@ export default {
             dateTime: `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`,
             id: 1,
             user: this.$store.state.aktiverUser,
+            adresse: data.features[0].properties.formatted,
           };
 
           this.ws.send(JSON.stringify(position));

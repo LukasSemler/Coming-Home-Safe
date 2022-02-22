@@ -7,13 +7,13 @@
     </v-row>
 
     <!--Google Maps Component-->
-    <GoogleMap />
-  </v-container>
+    <userMap />
+  </v-container>  
 </template>
 
 <script>
 import axios from 'axios';
-import GoogleMap from '../components/Google_Maps';
+import userMap from '../components/userMap.vue';
 export default {
   name: 'Map',
   data() {
@@ -21,7 +21,7 @@ export default {
       serverAdress: process.env.VUE_APP_SERVER_ADRESS,
     };
   },
-  components: { GoogleMap },
+  components: { userMap },
   methods: {
     async abmelden() {
       await axios.get(`${this.serverAdress}/abmelden`);

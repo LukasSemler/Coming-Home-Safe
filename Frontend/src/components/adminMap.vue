@@ -22,10 +22,13 @@
         <v-list-item three-line>
           <v-list-item-content>
             <v-list-item-title class="text-h5 mb-1"
-              >{{ users.vorname }} {{ users.nachname }}
+              >{{ users.user.vorname }} {{ users.user.nachname }}
             </v-list-item-title>
             <v-list-item-subtitle>
-              <b>Persoenliche Infos:</b> {{ users.hobbysinteressen }}</v-list-item-subtitle
+              <b>Persoenliche Infos:</b> {{ users.user.hobbysinteressen }}</v-list-item-subtitle
+            >
+            <v-list-item-subtitle>
+              <b>Aktuelle Adresse: </b> {{ users.adresse }}</v-list-item-subtitle
             >
           </v-list-item-content>
 
@@ -44,6 +47,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'GoogleMap',
   data() {
@@ -66,12 +71,15 @@ export default {
       locationSingleUser: [],
       users: {},
       currentPos: null,
+
+      lat: null,
+      long: null,
     };
   },
-  created() {
+  async created() {
     //Websockets funkionieren nur auf Heroku nicht auf localhost
-    let HOST = location.origin.replace(/^https/, 'wss');
-    this.ws = new WebSocket(HOST);
+    // let HOST = location.origin.replace(/^https/, 'wss');
+    this.ws = new WebSocket(this.ws_serverAdress);
 
     this.ws.onmessage = ({ data }) => {
       let bekommen = JSON.parse(data);
@@ -81,7 +89,7 @@ export default {
       if (bekommen.type == 'info') {
         this.locationSingleUser = [];
       } else {
-        this.users = bekommen.user;
+        this.users = { user: bekommen.user, adresse: bekommen.adresse };
         this.locationSingleUser = [
           {
             lat: bekommen.lat,
@@ -89,12 +97,30 @@ export default {
             lable: 'Current Position User 1',
           },
         ];
+
+        this.lat = bekommen.lat;
+        this.long = bekommen.lng;
+
+        //! Geht nicht, weil in Websocket ?
+        // const { data } = await axios.get(
+        //   `https://api.geoapify.com/v1/geocode/reverse?lat=${bekommen.lat}&lon=${bekommen.long}&apiKey=b40d04c271104006843d3c8dc5c8fd1b`,
+        // );
+
+        //*Momentan nicht notwendig
+        // console.log(data);
         //Center setzen
         // this.center.lat = this.currentPos.lat;
         // this.center.lng = this.currentPos.lng;
         //this.$forceUpdate();
       }
     };
+    if (this.lat != null && this.long != null) {
+      console.log('adresse');
+      // const { data } = await axios.get(
+      //   `https://api.geoapify.com/v1/geocode/reverse?lat=${this.lat}&lon=${this.long}&apiKey=b40d04c271104006843d3c8dc5c8fd1b`,
+      // );
+      // console.log(data);
+    }
   },
   methods: {
     backToMain() {

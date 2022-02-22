@@ -5,7 +5,7 @@ const path = require('path');
 const cors = require('cors');
 const routes = require('./routes/index');
 const expressSession = require('express-session');
-const colors = require("colors")
+const colors = require('colors');
 let { wsServer } = require('./websockets');
 
 require('dotenv').config();
