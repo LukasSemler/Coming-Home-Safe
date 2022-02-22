@@ -57,14 +57,8 @@ export default {
         lat: 48.2094881,
         lng: 16.3072147,
       },
-      currentPlace: null,
-      markers: [],
-      locations: [],
-      loc: [],
 
       text: 'Start Tracker',
-      started: false,
-      interval: '',
 
       ws: null,
       ws_serverAdress: 'ws://localhost:2410',
@@ -77,13 +71,17 @@ export default {
     };
   },
   async created() {
-    //Websockets funkionieren nur auf Heroku nicht auf localhost
-    // let HOST = location.origin.replace(/^https/, 'wss');
-    this.ws = new WebSocket(this.ws_serverAdress);
+    //Websockets schauen ob sie am Localhost oder auf Heroku verwendet werden
+    if (process.env.VUE_APP_WebSocketOfflineMode) {
+      this.ws = new WebSocket(this.ws_serverAdress);
+    } else {
+      let HOST = location.origin.replace(/^https/, 'wss');
+      this.ws = new WebSocket(HOST);
+    }
 
+    //Wenn Nachrichten von Websocket kommen
     this.ws.onmessage = ({ data }) => {
       let bekommen = JSON.parse(data);
-      console.log(bekommen);
       this.currentPos = bekommen;
 
       if (bekommen.type == 'info') {
@@ -101,11 +99,6 @@ export default {
         this.lat = bekommen.lat;
         this.long = bekommen.lng;
 
-        //! Geht nicht, weil in Websocket ?
-        // const { data } = await axios.get(
-        //   `https://api.geoapify.com/v1/geocode/reverse?lat=${bekommen.lat}&lon=${bekommen.long}&apiKey=b40d04c271104006843d3c8dc5c8fd1b`,
-        // );
-
         //*Momentan nicht notwendig
         // console.log(data);
         //Center setzen
@@ -114,6 +107,7 @@ export default {
         //this.$forceUpdate();
       }
     };
+
     if (this.lat != null && this.long != null) {
       console.log('adresse');
       // const { data } = await axios.get(
@@ -128,12 +122,14 @@ export default {
         name: 'Login_Register',
       });
     },
+
     setFocus() {
       console.log('click');
       console.log(this.center);
       this.center = { lat: this.currentPos.lat, lng: this.currentPos.lng };
       console.log(this.center);
     },
+
     setFocus2() {
       console.log('click');
       console.log(this.center);

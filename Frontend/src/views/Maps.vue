@@ -34,7 +34,7 @@ export default {
     },
   },
   mounted() {
-    console.log(this.$store.state.aktiverUser);
+    console.log(`Aktueller User: ${this.$store.state.aktiverUser.vorname} ${this.$store.state.aktiverUser.nachname}`);
   },
 };
 </script>

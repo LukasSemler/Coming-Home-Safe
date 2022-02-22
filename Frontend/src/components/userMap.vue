@@ -6,7 +6,7 @@
       <button @click="addMarker">Add</button> -->
     </v-container>
     <br />
-    <GmapMap :center="center" :zoom="12" style="width: 100%; height: 800px">
+    <GmapMap :center="centerPosition" :zoom="12" style="width: 100%; height: 800px">
       <GmapMarker :key="index" v-for="(m, index) in locations" :position="m" />
     </GmapMap>
 
@@ -15,11 +15,13 @@
 
     <v-container>
       <v-row class="justify-center">
-        <v-btn class="light-blue accent-3" @click="startTracker">{{ text }}</v-btn>
+        <v-btn class="light-blue accent-3" @click="startStopTracker">{{ text }}</v-btn>
       </v-row>
     </v-container>
+
+    <!--Coordinaten Testanzeige-->
     <ul v-for="(pos, i) in loc" :key="i">
-      <li>latitude: {{ pos.lat }} longitude: {{ pos.lng }} time: {{ pos.dateTime }}</li>
+      <li>ABC --> latitude: {{ pos.lat }} longitude: {{ pos.lng }} time: {{ pos.dateTime }}</li>
     </ul>
   </v-container>
 </template>
@@ -30,9 +32,7 @@ export default {
   name: 'userMap',
   data() {
     return {
-      center: {},
-      currentPlace: null,
-      markers: [],
+      centerPosition: {},
       locations: [],
       loc: [],
 
@@ -58,23 +58,19 @@ export default {
   mounted() {
     this.setLocationLatLng();
 
-    //Websockets funkionieren nur auf Heroku nicht auf localhost
-    // let HOST = location.origin.replace(/^https/, 'wss');
-    this.ws = new WebSocket(this.ws_serverAdress);
-    this.ws.onmessage = ({ data }) => {
-      // console.log(data);
-      try {
-        let bekommen = JSON.parse(data);
-        console.log(bekommen);
-      } catch (error) {
-        console.log(error);
-      }
-    };
+    //Websockets schauen ob sie am Localhost oder auf Heroku verwendet werden
+    if (process.env.VUE_APP_WebSocketOfflineMode) {
+      this.ws = new WebSocket(this.ws_serverAdress);
+    } else {
+      let HOST = location.origin.replace(/^https/, 'wss');
+      this.ws = new WebSocket(HOST);
+    }
   },
   methods: {
     backToMain() {
       this.$router.push({ name: 'Login_Register' });
-    }, //
+    },
+
     setLocationLatLng() {
       navigator.geolocation.getCurrentPosition((geolocation) => {
         let currPos = {
@@ -82,9 +78,7 @@ export default {
           lng: geolocation.coords.longitude,
         };
 
-        this.$store.state.currentPosition = currPos;
-        console.log(`Current position Google Maps = ${currPos}`);
-        this.center = currPos;
+        this.centerPosition = currPos;
 
         this.locations = [
           {
@@ -96,7 +90,7 @@ export default {
       });
     },
 
-    startTracker() {
+    startStopTracker() {
       if (!this.started) {
         this.started = true;
         this.text = 'Stop Tracker';
@@ -107,12 +101,12 @@ export default {
         clearInterval(this.interval);
       }
     },
+
     async track() {
       let lat = '';
       let lng = '';
       let position = '';
       let date = new Date();
-      // console.log(this.locations);
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(async (pos) => {
@@ -122,9 +116,8 @@ export default {
           const { data } = await axios.get(
             `https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lng}&apiKey=${this.apiKey}`,
           );
-          // console.log(data.features[0].properties);
 
-          //Object fuer DB bauen
+          //Object für DB bauen
           position = {
             lat,
             lng,
@@ -136,17 +129,17 @@ export default {
 
           this.ws.send(JSON.stringify(position));
 
-          this.loc.push(position); //Marker auf aktuelle position setzten
+          //Ins Anzeigearray pushen
+          this.loc.push(position);
+
+          //Aktuelle Position in der Markerliste
           this.locations = [
             {
-              lat: pos.coords.latitude,
-              lng: pos.coords.longitude,
+              lat: position.lat,
+              lng: position.lng,
               lable: 'Current Position',
             },
           ];
-
-          //Axios Call Post
-          // const res = await axios.post(`${this.serverAdress}/location`, { position });
         });
       } else {
         alert('Dieser Browser unterstützt die Abfrage der Geolocation nicht.');
