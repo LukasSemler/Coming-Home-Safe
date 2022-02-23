@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-container>
-      <h2 class="text-center">Watch Position</h2>
+      <h2 class="text-center">Watch Position Test</h2>
       <v-btn @click="backToMain">Back to Login/Register</v-btn>
       <!-- <GmapAutocomplete @place_changed="setPlace" />
       <button @click="addMarker">Add</button> -->
