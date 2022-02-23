@@ -26,7 +26,8 @@
             </v-list-item-title>
             <v-list-item-subtitle>
               <b>Persoenliche Infos:</b> {{ users.user.hobbysinteressen }}</v-list-item-subtitle
-            >
+              
+            > 
             <v-list-item-subtitle>
               <b>Aktuelle Adresse: </b> {{ users.adresse }}</v-list-item-subtitle
             >
@@ -82,6 +83,7 @@ export default {
     //Wenn Nachrichten von Websocket kommen
     this.ws.onmessage = ({ data }) => {
       let bekommen = JSON.parse(data);
+      console.log(bekommen)
       this.currentPos = bekommen;
 
       if (bekommen.type == 'info') {

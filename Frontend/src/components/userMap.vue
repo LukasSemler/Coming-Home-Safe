@@ -117,6 +117,8 @@ export default {
             `https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lng}&apiKey=${this.apiKey}`,
           );
 
+          console.log(data);
+
           //Object für DB bauen
           position = {
             lat,
@@ -124,7 +126,7 @@ export default {
             dateTime: `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`,
             id: 1,
             user: this.$store.state.aktiverUser,
-            adresse: data.features[0].properties.formatted,
+            // adresse: data.features[0].properties.formatted,
           };
 
           this.ws.send(JSON.stringify(position));
