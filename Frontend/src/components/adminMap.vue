@@ -89,6 +89,7 @@ export default {
     //Wenn Nachrichten von Websocket kommen
     this.ws.onmessage = ({ data }) => {
       let bekommen = JSON.parse(data);
+      console.log(bekommen)
       console.log(bekommen);
       this.currentPos = bekommen;
 

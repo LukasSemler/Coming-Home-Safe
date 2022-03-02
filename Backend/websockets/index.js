@@ -12,7 +12,6 @@ function wsServer(httpServer) {
     //Wenn der WebsocketServer Nachrichten bekommt
     ws.on('message', (data) => {
       const bekommen = JSON.parse(data);
-      bekommen.type = 'Coords';
       connections.forEach((elem) => elem.send(JSON.stringify(bekommen)));
     });
 
