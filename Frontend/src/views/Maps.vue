@@ -8,12 +8,13 @@
 
     <!--Google Maps Component-->
     <userMap />
-  </v-container>  
+  </v-container>
 </template>
 
 <script>
 import axios from 'axios';
 import userMap from '../components/userMap.vue';
+
 export default {
   name: 'Map',
   data() {
@@ -24,17 +25,20 @@ export default {
   components: { userMap },
   methods: {
     async abmelden() {
+      //WIchtig um sessin zu beenden
       await axios.get(`${this.serverAdress}/abmelden`);
-      this.$router.push('/');
-
-      localStorage.removeItem(`login`);
 
       //Kunden aus Store löschen
       this.$store.dispatch('LogoutKunde');
+
+      //Zurück zur Startseite
+      this.$router.push('/');
     },
   },
   mounted() {
-    console.log(`Aktueller User: ${this.$store.state.aktiverUser.vorname} ${this.$store.state.aktiverUser.nachname}`);
+    console.log(
+      `Aktueller User: ${this.$store.state.aktiverUser.vorname} ${this.$store.state.aktiverUser.nachname}`,
+    );
   },
 };
 </script>

@@ -40,16 +40,6 @@ export default {
 			this.$router.push("/adminPanel")
 		},
 	},
-	created() {
-		let alreadyLogin = JSON.parse(localStorage.getItem('login'));
-		console.log(alreadyLogin);
-
-		this.$store.state.aktiverUser = alreadyLogin;
-		console.log(this.$store.state.aktiverUser);
-	},
-	// destroyed() {
-	// 	console.log('destroyed');
-	// },
 };
 </script>
 

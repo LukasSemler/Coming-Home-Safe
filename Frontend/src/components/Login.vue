@@ -145,9 +145,6 @@ export default {
         //Aktiven Kunden im Store setzen
         this.$store.dispatch('LoginKunde', this.foundUser);
 
-        //Kunden im LS speichern
-        localStorage.setItem(`login`, JSON.stringify(this.$store.state.aktiverUser));
-
         //Zur Map weiterleiten
         this.$router.push('/map');
 
@@ -189,8 +186,6 @@ export default {
           //Aktiven Kunden im Store setzen
           this.$store.dispatch('LoginKunde', foundUser);
 
-          //Kunden im LS speichern
-          localStorage.setItem(`login`, JSON.stringify(this.$store.state.aktiverUser));
 
           //Zur Map weiterleiten
           this.$router.push('/map');
