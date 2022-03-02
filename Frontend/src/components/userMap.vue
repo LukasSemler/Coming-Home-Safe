@@ -74,12 +74,14 @@ export default {
 
   methods: {
     sendAlarm() {
+      console.log(this.currentPos, 'Current Pos');
       const closest = findPolizeistation(this.centerPosition.lat, this.centerPosition.lng);
       console.log(closest);
       const obj = {
         type: 'Alarm',
         user: this.$store.state.aktiverUser,
       };
+      console.log(obj);
       this.ws.send(JSON.stringify(obj));
     },
 
@@ -177,7 +179,7 @@ export default {
           dateTime: `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`,
           id: 1,
           user: this.$store.state.aktiverUser,
-          // adresse: data.features[0].properties.formatted,
+          adresse: standort,
         };
 
         this.ws.send(JSON.stringify(position));
