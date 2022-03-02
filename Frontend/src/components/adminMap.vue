@@ -18,7 +18,7 @@
     <!-- <h2 class="text-center" v-else>Aktiver User: {{ users.vorname }} {{ users.nachname }}</h2> -->
 
     <v-container v-if="locationSingleUser.length != 0">
-      <v-card class="mx-auto" max-width="500" elevation="2">
+      <v-card class="mx-auto" max-width="500" elevation="2" :color="color">
         <v-list-item three-line>
           <v-list-item-content>
             <v-list-item-title class="text-h5 mb-1"
@@ -26,8 +26,7 @@
             </v-list-item-title>
             <v-list-item-subtitle>
               <b>Persoenliche Infos:</b> {{ users.user.hobbysinteressen }}</v-list-item-subtitle
-              
-            > 
+            >
             <v-list-item-subtitle>
               <b>Aktuelle Adresse: </b> {{ users.adresse }}</v-list-item-subtitle
             >
@@ -38,6 +37,9 @@
 
         <v-card-actions>
           <v-btn class="light-blue" outlined text @click="setFocus"> Show on Map </v-btn>
+          <v-btn v-if="alarm" class="light-blue" outlined text @click="clearAlarm">
+            Dismiss Alarm
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-container>
@@ -69,6 +71,10 @@ export default {
 
       lat: null,
       long: null,
+      //Alarm
+      alarm: false,
+      color: 'white',
+      interval: null,
     };
   },
   async created() {
@@ -83,11 +89,19 @@ export default {
     //Wenn Nachrichten von Websocket kommen
     this.ws.onmessage = ({ data }) => {
       let bekommen = JSON.parse(data);
-      console.log(bekommen)
+      console.log(bekommen);
       this.currentPos = bekommen;
 
       if (bekommen.type == 'info') {
         this.locationSingleUser = [];
+      }
+      //Neu
+      else if (bekommen.type == 'Alarm') {
+        this.alarm = true
+        this.interval = setInterval(() => {
+          if (this.color == 'white') this.color = 'red';
+          else this.color = 'white';
+        }, 500);
       } else {
         this.users = { user: bekommen.user, adresse: bekommen.adresse };
         this.locationSingleUser = [
@@ -119,6 +133,11 @@ export default {
     }
   },
   methods: {
+    clearAlarm() {
+      this.alarm = false;
+      clearInterval(this.interval);
+      this.color = 'white'
+    },
     backToMain() {
       this.$router.push({
         name: 'Login_Register',
