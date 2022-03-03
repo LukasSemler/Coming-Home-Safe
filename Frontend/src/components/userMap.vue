@@ -6,6 +6,7 @@
 
     <!--Map-->
     <div id="map" style="height: 400px"></div>
+    <div v-if="alarmStarted" id="instructions"></div>
 
     <br />
     <br />
@@ -22,9 +23,9 @@
     </v-container>
 
     <!-- Coordinaten Testanzeige -->
-    <ul v-for="(pos, i) in loc" :key="i">
+    <!-- <ul v-for="(pos, i) in loc" :key="i">
       <li>ABC: latitude: {{ pos.lat }} longitude: {{ pos.lng }} time: {{ pos.dateTime }}</li>
-    </ul>
+    </ul> -->
   </v-container>
 </template>
 
@@ -56,6 +57,10 @@ export default {
       mapMarkerListe: [],
 
       apiKey: process.env.VUE_APP_GEOCODING,
+
+      closestPol: null,
+
+      alarmStarted: false,
     };
   },
 
@@ -73,15 +78,162 @@ export default {
   },
 
   methods: {
+    //Route berechnen
+    async getRoute(end) {
+      const start = [this.centerPosition.lng, this.centerPosition.lat];
+      // make a directions request using cycling profile
+      // an arbitrary start will always be the same
+      // only the end or destination will change
+      const query = await fetch(
+        `https://api.mapbox.com/directions/v5/mapbox/walking/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${this.mapAccessToken}`,
+        { method: 'GET' },
+      );
+      const json = await query.json();
+      const data = json.routes[0];
+      const route = data.geometry.coordinates;
+      const geojson = {
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'LineString',
+          coordinates: route,
+        },
+      };
+      // if the route already exists on the map, we'll reset it using setData
+      if (this.map.getSource('route')) {
+        this.map.getSource('route').setData(geojson);
+      }
+      // otherwise, we'll make a new request
+      else {
+        this.map.addLayer({
+          id: 'route',
+          type: 'line',
+          source: {
+            type: 'geojson',
+            data: geojson,
+          },
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round',
+          },
+          paint: {
+            'line-color': '#3887be',
+            'line-width': 5,
+            'line-opacity': 0.75,
+          },
+        });
+      }
+      // add turn instructions here at the end
+      // get the sidebar and add the instructions
+      const instructions = document.getElementById('instructions');
+      const steps = data.legs[0].steps;
+
+      let tripInstructions = '';
+      for (const step of steps) {
+        tripInstructions += `<li>${step.maneuver.instruction}</li>`;
+      }
+      instructions.innerHTML = `<p><strong>Trip duration: ${Math.floor(
+        data.duration / 60,
+      )} min  </strong></p><ol>${tripInstructions}</ol>`;
+    },
+    //____________________________________________________________________
     sendAlarm() {
-      console.log(this.currentPos, 'Current Pos');
-      const closest = findPolizeistation(this.centerPosition.lat, this.centerPosition.lng);
-      console.log(closest);
+      this.alarmStarted = true;
+      const start = [this.centerPosition.lng, this.centerPosition.lat];
+      //Für Route:
+      // const start = [this.centerPosition.lat, this.centerPosition.lng];
+      this.closestPol = findPolizeistation(this.centerPosition.lat, this.centerPosition.lng);
+      let cx = this.closestPol.station.X;
+      let cy = this.closestPol.station.Y;
+
+      console.log(this.closestPol);
+      cx = cx.replace(',', '.');
+      cy = cy.replace(',', '.');
+
+      cx = Number(cx);
+      cy = Number(cy);
+
+      console.log(cx, cy);
+
+      // make an initial directions request that
+      // starts and ends at the same location
+      this.getRoute(start);
+
+      // Add starting point to the map
+      this.map.addLayer({
+        id: 'point',
+        type: 'circle',
+        source: {
+          type: 'geojson',
+          data: {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                  type: 'Point',
+                  coordinates: start,
+                },
+              },
+            ],
+          },
+        },
+        paint: {
+          'circle-radius': 10,
+          'circle-color': '#3887be',
+        },
+      });
+
+      const coords = [cx, cy];
+      const end = {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Point',
+              coordinates: coords,
+            },
+          },
+        ],
+      };
+      if (this.map.getLayer('end')) {
+        this.map.getSource('end').setData(end);
+      } else {
+        this.map.addLayer({
+          id: 'end',
+          type: 'circle',
+          source: {
+            type: 'geojson',
+            data: {
+              type: 'FeatureCollection',
+              features: [
+                {
+                  type: 'Feature',
+                  properties: {},
+                  geometry: {
+                    type: 'Point',
+                    coordinates: coords,
+                  },
+                },
+              ],
+            },
+          },
+          paint: {
+            'circle-radius': 10,
+            'circle-color': '#f30',
+          },
+        });
+      }
+      this.getRoute(coords);
+
       const obj = {
         type: 'Alarm',
         user: this.$store.state.aktiverUser,
       };
-      console.log(obj);
+
       this.ws.send(JSON.stringify(obj));
     },
 
@@ -190,3 +342,17 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+#instructions {
+  position: absolute;
+  margin: 20px;
+  width: 25%;
+  top: 0;
+  bottom: 20%;
+  padding: 20px;
+  background-color: #fff;
+  overflow-y: scroll;
+  font-family: sans-serif;
+}
+</style>

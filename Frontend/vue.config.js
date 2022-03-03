@@ -1,5 +1,8 @@
 const path = require('path');
 module.exports = {
-	transpileDependencies: ['vuetify'],
-	outputDir: path.resolve(__dirname, '../Backend/public'),
+  devServer: {
+    port: 8081, // CHANGE YOUR PORT HERE!
+  },
+  transpileDependencies: ['vuetify'],
+  outputDir: path.resolve(__dirname, '../Backend/public'),
 };
