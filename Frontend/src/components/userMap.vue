@@ -298,6 +298,16 @@ export default {
         //Marker löschen
         this.deleteAllMarkers();
         clearInterval(this.interval);
+
+        //Layers löschen
+        this.map.removeLayer('route');
+        this.map.removeSource('route');
+
+        this.map.removeLayer('point');
+        this.map.removeSource('point');
+
+        this.map.removeLayer('end');
+        this.map.removeSource('end');
       }
     },
 
