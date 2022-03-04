@@ -5,8 +5,29 @@
     </v-container>
 
     <!--Map-->
-    <div id="map" style="height: 400px"></div>
-    <div v-if="alarmStarted" id="instructions"></div>
+    <div id="map" style="height: 600px"></div>
+
+    <br />
+    <br />
+    <v-row class="justify-center">
+      <v-col cols="3">
+        <v-card v-if="alarmStarted" elevation="5" max-width="374">
+          <v-card-title class="text-h5 mb-3">Dauer: {{ dauerRoute }}min </v-card-title>
+
+          <v-card-subtitle v-for="(step, i) of routenAnweisungen" :key="i">
+            {{ step }}
+            <!-- <span v-if="step.includes('Turn left')">
+              <v-icon large>mdi-arrow-left-top-bold</v-icon>{{ step }}
+            </span>
+            <span v-if="step.includes('Turn right')">
+              <v-icon large>mdi-arrow-right-top-bold</v-icon>{{ step }}
+            </span>
+            <span v-else> <v-icon large>mdi-arrow-right-top-bold</v-icon>{{ step }} </span> -->
+          </v-card-subtitle>
+        </v-card>
+      </v-col>
+    </v-row>
+    <!-- Routen anweisungen -->
 
     <br />
     <br />
@@ -61,6 +82,8 @@ export default {
       closestPol: null,
 
       alarmStarted: false,
+      routenAnweisungen: [],
+      dauerRoute: null,
     };
   },
 
@@ -123,18 +146,12 @@ export default {
           },
         });
       }
-      // add turn instructions here at the end
-      // get the sidebar and add the instructions
-      const instructions = document.getElementById('instructions');
+      // Routenanweisung
       const steps = data.legs[0].steps;
-
-      let tripInstructions = '';
       for (const step of steps) {
-        tripInstructions += `<li>${step.maneuver.instruction}</li>`;
+        this.routenAnweisungen.push(step.maneuver.instruction);
       }
-      instructions.innerHTML = `<p><strong>Trip duration: ${Math.floor(
-        data.duration / 60,
-      )} min  </strong></p><ol>${tripInstructions}</ol>`;
+      this.dauerRoute = Math.floor(data.duration / 60);
     },
     //____________________________________________________________________
     sendAlarm() {
@@ -264,7 +281,7 @@ export default {
         container: 'map', // container ID
         style: this.mapStyle, // style URL
         center: [this.centerPosition.lng, this.centerPosition.lat],
-        zoom: 6, // starting zoom
+        zoom: 13, // starting zoom
       });
     },
 
@@ -276,6 +293,7 @@ export default {
         this.interval = setInterval(this.track, 2500);
       } else {
         this.started = false;
+        this.alarmStarted = false;
         this.text = 'Start Tracker';
         //Marker löschen
         this.deleteAllMarkers();
