@@ -84,6 +84,8 @@ export default {
       alarmStarted: false,
       routenAnweisungen: [],
       dauerRoute: null,
+
+      aktiverUser: this.$store.state.aktiverUser,
     };
   },
 
@@ -92,8 +94,10 @@ export default {
     this.setLocationLatLngAndMap();
 
     //Websockets schauen ob sie am Localhost oder auf Heroku verwendet werden
+    let email = this.aktiverUser.email;
+    email = email.replace('@', '|');
     if (process.env.VUE_APP_WebSocketOfflineMode) {
-      this.ws = new WebSocket(this.ws_serverAdress);
+      this.ws = new WebSocket(this.ws_serverAdress, email);
     } else {
       let HOST = location.origin.replace(/^https/, 'wss');
       this.ws = new WebSocket(HOST);

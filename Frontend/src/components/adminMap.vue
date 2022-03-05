@@ -14,17 +14,24 @@
     </h1>
 
     <v-container v-if="locationSingleUser.length != 0">
-      <v-card class="mx-auto" max-width="500" elevation="2" :color="color">
+      <v-card
+        class="mx-auto"
+        max-width="500"
+        elevation="2"
+        :color="color"
+        v-for="(user, i) of multiUser"
+        :key="i"
+      >
         <v-list-item three-line>
           <v-list-item-content>
             <v-list-item-title class="text-h5 mb-1"
-              >{{ users.user.vorname }} {{ users.user.nachname }}
+              >{{ user.user.vorname }} {{ user.user.nachname }}
             </v-list-item-title>
             <v-list-item-subtitle>
-              <b>Persoenliche Infos:</b> {{ users.user.hobbysinteressen }}</v-list-item-subtitle
+              <b>Persoenliche Infos:</b> {{ user.user.hobbysinteressen }}</v-list-item-subtitle
             >
             <v-list-item-subtitle>
-              <b>Aktuelle Adresse: </b> {{ users.adresse }}</v-list-item-subtitle
+              <b>Aktuelle Adresse: </b> {{ user.adresse }}</v-list-item-subtitle
             >
           </v-list-item-content>
 
@@ -64,6 +71,8 @@ export default {
       ws_serverAdress: 'ws://localhost:2410',
       locationSingleUser: [],
       users: {},
+      //? Neu
+      multiUser: [],
       currentPos: null,
 
       lat: null,
@@ -95,13 +104,13 @@ export default {
     //Wenn Nachrichten von Websocket kommen
     this.ws.onmessage = ({ data }) => {
       let bekommen = JSON.parse(data);
-      console.log(bekommen)
-      console.log(bekommen);
+
       this.currentPos = bekommen;
 
       //Messages von WS zu Admin
-      if (bekommen.type == 'info') {
-        this.locationSingleUser = [];
+      if (bekommen.type == 'userLeft') {
+        //? user welcher gegangen ist entfernen
+        this.multiUser = this.multiUser.filter((elem) => elem.user.email != bekommen.payload);
       } else if (bekommen.type == 'Alarm') {
         this.alarm = true;
         this.interval = setInterval(() => {
@@ -109,7 +118,65 @@ export default {
           else this.color = 'white';
         }, 500);
       } else {
-        this.users = { user: bekommen.user, adresse: bekommen.adresse };
+        //? Schauen ob der User schon vorhanden ist
+        let gefunden = this.multiUser.find((element) => element.user.email == bekommen.user.email);
+        //? Wenn noch nicht vorhanden pushen
+        if (!gefunden) {
+          //? Neuen User ins Array Pushen
+          this.multiUser.push({
+            user: bekommen.user,
+            adresse: bekommen.adresse,
+            lat: bekommen.lat,
+            lng: bekommen.lng,
+          });
+
+          //? Neuen Marker erstellen
+          const marker = new mapbox.Marker({
+            anchor: 'center',
+            color: Math.floor(Math.random() * 16777215).toString(16),
+          })
+            .setLngLat([bekommen.lng, bekommen.lat])
+            .addTo(this.map)
+            .setPopup(new mapbox.Popup().setHTML(`<p>Deine Position: ${bekommen.adresse} </p>`));
+
+          this.mapMarkerListe.push({ marker, user: bekommen.user });
+        } else {
+          this.multiUser.forEach((elem) => {
+            //? Schauen ob sich die Adresse geandert hat
+            if (elem.lat != bekommen.lat && elem.lng != bekommen.lng) {
+              //? Wenn sich die Werte geandert haben sie neu zuweisen
+              gefunden.adresse = bekommen.adresse;
+              gefunden.lat = bekommen.lat;
+              gefunden.lng = bekommen.lng;
+
+              //? Alten Marker vom user loeschen
+              console.log(this.mapMarkerListe);
+              this.mapMarkerListe.forEach((elem) => {
+                if (elem.user.email == gefunden.user.email) {
+                  const index = this.mapMarkerListe.findIndex((x) => x.user.email == bekommen.user.email);
+                  console.log(index, 'indx');
+                  // this.mapMarkerListe[index].marker.setLngLat([bekommen.lng, bekommen.lat])
+                  console.log(this.mapMarkerListe[index]);
+                  this.mapMarkerListe.splice(index, 1);
+                  elem.marker.remove();
+
+                  //? Neuen marker erstellen
+                  const marker = new mapbox.Marker({
+                    anchor: 'center',
+                    color: Math.floor(Math.random() * 16777215).toString(16),
+                  })
+                    .setLngLat([gefunden.lng, gefunden.lat])
+                    .addTo(this.map)
+                    .setPopup(
+                      new mapbox.Popup().setHTML(`<p>Deine Position: ${gefunden.adresse} </p>`),
+                    ); // add popup
+                  this.mapMarkerListe.push({ marker, user: gefunden.user });
+                }
+              });
+            }
+          });
+        }
+
         this.locationSingleUser = [
           {
             lat: bekommen.lat,

@@ -11,6 +11,9 @@
 					Zum Admin Panel
 				</v-btn>
 			</v-col>
+      <div v-else>
+          <h1>Else</h1>
+      </div>
 		</v-row>
 		<br />
 		<adminMap />
