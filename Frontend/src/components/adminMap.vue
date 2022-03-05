@@ -6,7 +6,7 @@
     <br />
 
     <!--Map-->
-    <div id="map" style="height: 400px"></div>
+    <div id="map" style="height: 600px"></div>
 
     <br />
     <h1 class="text-center" v-if="locationSingleUser.length == 0">
@@ -128,12 +128,13 @@ export default {
             adresse: bekommen.adresse,
             lat: bekommen.lat,
             lng: bekommen.lng,
+            markerFarbe: this.markerFarbe(),
           });
 
           //? Neuen Marker erstellen
           const marker = new mapbox.Marker({
             anchor: 'center',
-            color: Math.floor(Math.random() * 16777215).toString(16),
+            color: markerFarbe,
           })
             .setLngLat([bekommen.lng, bekommen.lat])
             .addTo(this.map)
@@ -150,26 +151,30 @@ export default {
               gefunden.lng = bekommen.lng;
 
               //? Alten Marker vom user loeschen
-              console.log(this.mapMarkerListe);
               this.mapMarkerListe.forEach((elem) => {
+                //? Marker vom user finden
                 if (elem.user.email == gefunden.user.email) {
-                  const index = this.mapMarkerListe.findIndex((x) => x.user.email == bekommen.user.email);
-                  console.log(index, 'indx');
-                  // this.mapMarkerListe[index].marker.setLngLat([bekommen.lng, bekommen.lat])
-                  console.log(this.mapMarkerListe[index]);
+                  //? Index vom Obj mit user und marker finden
+                  const index = this.mapMarkerListe.findIndex(
+                    (x) => x.user.email == bekommen.user.email,
+                  );
+
+                  //? marker aus Arry und Karte entfernen
                   this.mapMarkerListe.splice(index, 1);
                   elem.marker.remove();
 
-                  //? Neuen marker erstellen
+                  // //? Neuen marker erstellen
                   const marker = new mapbox.Marker({
                     anchor: 'center',
-                    color: Math.floor(Math.random() * 16777215).toString(16),
+                    color: elem.markerFarbe,
                   })
                     .setLngLat([gefunden.lng, gefunden.lat])
                     .addTo(this.map)
                     .setPopup(
                       new mapbox.Popup().setHTML(`<p>Deine Position: ${gefunden.adresse} </p>`),
                     ); // add popup
+
+                  //? Neuen Marker mit User im Array speichern
                   this.mapMarkerListe.push({ marker, user: gefunden.user });
                 }
               });
@@ -214,6 +219,9 @@ export default {
   },
 
   methods: {
+    markerFarbe() {
+      return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+    },
     clearUserAlarm() {
       this.alarm = false;
       clearInterval(this.interval);
