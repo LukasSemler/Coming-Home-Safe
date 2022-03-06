@@ -27,7 +27,6 @@
         </v-card>
       </v-col>
     </v-row>
-    <!-- Routen anweisungen -->
 
     <br />
     <br />

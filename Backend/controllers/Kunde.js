@@ -5,6 +5,7 @@ const {
   Login,
   getUsersfromDB,
   changeAdmin,
+  ChangeUserPassword,
 } = require('../globaleDinge');
 
 //Kunden den Auth-Code senden
@@ -41,6 +42,7 @@ const RegisterIntoDatabaseHandler = async (req, res) => {
   }
 };
 
+//Hier loggt sich der Kunde ein
 const LoginHandler = async (req, res) => {
   const data = req.body;
 
@@ -78,6 +80,7 @@ const LogoutHandler = (req, res) => {
   res.end();
 };
 
+//Hier bekommt man alle User
 const getUsersHandler = async (req, res) => {
   const erg = await getUsersfromDB();
 
@@ -93,6 +96,21 @@ const PatchAdminHandler = async (req, res) => {
   await changeAdmin(value, id);
 };
 
+//User kann sein Passwort wechseln
+const ChangePasswortHandler = async (req, res) => {
+  //Variablen bekommen
+  const { email } = req.params;
+  const { newPw } = req.body;
+
+  //Passwort ändern
+  let erfolgreichGeändert = await ChangeUserPassword(email, newPw);
+  if (erfolgreichGeändert == true) {
+    res.status(200).send('Passwort erfolgreich geändert :)');
+  } else {
+    res.status(210).send('Es ist ein Fehler beim Ändern des Passwortest vorgefallen :(');
+  }
+};
+
 module.exports = {
   SendAuthCodeHandler,
   RegisterIntoDatabaseHandler,
@@ -100,4 +118,5 @@ module.exports = {
   LogoutHandler,
   getUsersHandler,
   PatchAdminHandler,
+  ChangePasswortHandler,
 };

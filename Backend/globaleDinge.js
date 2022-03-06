@@ -276,6 +276,29 @@ async function changeAdmin({ value }, id) {
   DatenbankTrennen();
 }
 
+async function ChangeUserPassword(email, newPw) {
+  //DB-Verbindung herstellen
+  DatenbankVerbinden();
+
+  return new Promise((resolve) => {
+    aktiverClient.query(
+      'UPDATE kunde SET passwort = $1 WHERE email = $2',
+      [newPw, email],
+      (err) => {
+        if (!err) {
+          //DB-Verbindung trennen
+          DatenbankTrennen();
+          resolve(true);
+        } else {
+          //DB-Verbindung trennen
+          DatenbankTrennen();
+          resolve( false);
+        }
+      },
+    );
+  });
+}
+
 //Exporte
 module.exports = {
   SendAuthCode,
@@ -284,4 +307,5 @@ module.exports = {
   Login,
   getUsersfromDB,
   changeAdmin,
+  ChangeUserPassword,
 };

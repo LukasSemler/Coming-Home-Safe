@@ -8,6 +8,7 @@
     <!--Map-->
     <div id="map" style="height: 600px"></div>
 
+    <!--User die getracked werden-->
     <br />
     <h1 class="text-center" v-if="locationSingleUser.length == 0">
       Es sind noch keine User vorhanden
@@ -39,32 +40,27 @@
         </v-list-item>
 
         <v-card-actions>
-          <v-btn class="light-blue" outlined text @click="setFocusToUser"> Show on Map </v-btn>
+          <v-btn class="light-blue" outlined text @click="setFocusToUser(user)">
+            Show on Map
+          </v-btn>
           <v-btn v-if="alarm" class="light-blue" outlined text @click="clearUserAlarm">
             Dismiss Alarm
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-container>
-    <v-btn class="light-blue" outlined text @click="setFocus2"> Show on Map2 </v-btn>
     <br />
     <br />
   </v-container>
 </template>
 
 <script>
-import axios from 'axios';
 import mapbox from 'mapbox-gl';
 
 export default {
   name: 'GoogleMap',
   data() {
     return {
-      center: {
-        lat: 48.2094881,
-        lng: 16.3072147,
-      },
-
       text: 'Start Tracker',
 
       ws: null,
@@ -134,7 +130,7 @@ export default {
           //? Neuen Marker erstellen
           const marker = new mapbox.Marker({
             anchor: 'center',
-            color: markerFarbe,
+            color: this.markerFarbe(),
           })
             .setLngLat([bekommen.lng, bekommen.lat])
             .addTo(this.map)
@@ -143,24 +139,24 @@ export default {
           this.mapMarkerListe.push({ marker, user: bekommen.user });
         } else {
           this.multiUser.forEach((elem) => {
-            //? Schauen ob sich die Adresse geandert hat
-            if (elem.lat != bekommen.lat && elem.lng != bekommen.lng) {
+            //? Schauen ob sich die Adresse gändert hat
+            if (elem.lat != bekommen.lat || elem.lng != bekommen.lng) {
               //? Wenn sich die Werte geandert haben sie neu zuweisen
               gefunden.adresse = bekommen.adresse;
               gefunden.lat = bekommen.lat;
               gefunden.lng = bekommen.lng;
 
-              //? Alten Marker vom user loeschen
+              //? Alten Marker vom user löschen
               this.mapMarkerListe.forEach((elem) => {
                 //? Marker vom user finden
                 if (elem.user.email == gefunden.user.email) {
                   //? Index vom Obj mit user und marker finden
-                  const index = this.mapMarkerListe.findIndex(
+                  const userIndex = this.mapMarkerListe.findIndex(
                     (x) => x.user.email == bekommen.user.email,
                   );
 
                   //? marker aus Arry und Karte entfernen
-                  this.mapMarkerListe.splice(index, 1);
+                  this.mapMarkerListe.splice(userIndex, 1);
                   elem.marker.remove();
 
                   // //? Neuen marker erstellen
@@ -228,18 +224,12 @@ export default {
       this.color = 'white';
     },
 
-    setFocusToUser() {
-      console.log('click');
-      console.log(this.center);
-      this.center = { lat: this.currentPos.lat, lng: this.currentPos.lng };
-      console.log(this.center);
-    },
-
-    setFocus2() {
-      console.log('click');
-      console.log(this.center);
-      this.center = { lat: 16.0, lng: 0.1234 };
-      console.log(this.center);
+    setFocusToUser({ lat: aktuellLat, lng: aktuellLng }) {
+      //Centriert die Map an einem User, und zoomt auch näher hin
+      this.map.flyTo({
+        center: [aktuellLng, aktuellLat],
+        zoom: 16,
+      });
     },
   },
 };

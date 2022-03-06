@@ -100,8 +100,8 @@ export default {
   data() {
     return {
       serverAdress: process.env.VUE_APP_SERVER_ADRESS,
-      email: '',
-      passwort: '',
+      email: 'benjamin.stauf11@gmail.com',
+      passwort: 'test',
       showPasswordInput: false,
       showPasswortVergessen: false,
       validLogin: true,
