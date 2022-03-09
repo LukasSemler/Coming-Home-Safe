@@ -12,7 +12,9 @@
     <v-row class="justify-center">
       <v-col cols="3">
         <v-card v-if="alarmStarted" elevation="5" max-width="374">
-          <v-card-title class="text-h5 mb-3">Dauer: {{ dauerRoute }}min </v-card-title>
+          <v-card-title class="text-h5 mb-3"
+            >Dauer: {{ dauerRoute }}min
+          </v-card-title>
 
           <v-card-subtitle v-for="(step, i) of routenAnweisungen" :key="i">
             {{ step }}
@@ -34,10 +36,10 @@
     <v-container>
       <v-row class="justify-center">
         <!--Start/Stop-Button-->
-        <v-btn class="light-blue accent-3" @click="startStopTracker">{{ text }}</v-btn>
+        <v-btn class="chs-button" @click="startStopTracker">{{ text }}</v-btn>
         <!--Alarm-Button-->
         <v-row class="justify-center" v-if="started">
-          <v-btn class="red" @click="sendAlarm">Alarm</v-btn>
+          <v-btn class="chs-button-red" @click="sendAlarm">Alarm</v-btn>
         </v-row>
       </v-row>
     </v-container>
@@ -50,30 +52,30 @@
 </template>
 
 <script>
-import axios from 'axios';
-import mapbox from 'mapbox-gl';
-import findPolizeistation from '../PolizeistationFinden';
+import axios from "axios";
+import mapbox from "mapbox-gl";
+import findPolizeistation from "../PolizeistationFinden";
 
 export default {
-  name: 'userMap',
+  name: "userMap",
 
   data() {
     return {
       centerPosition: undefined,
       loc: [],
 
-      text: 'Start Tracker',
+      text: "Start Tracker",
       started: false,
-      interval: '',
+      interval: "",
 
       ws: null,
-      ws_serverAdress: 'ws://localhost:2410',
+      ws_serverAdress: "ws://localhost:2410",
 
       //Map
       map: null,
       mapAccessToken:
-        'pk.eyJ1IjoiY29taW5naG9tZXNhZmUiLCJhIjoiY2wwN3RzZThnMDF3czNjbzFndnNrZ3h4OCJ9.xuaKaO_7XzSqiIBCAvcT7w',
-      mapStyle: 'mapbox://styles/mapbox/streets-v11',
+        "pk.eyJ1IjoiY29taW5naG9tZXNhZmUiLCJhIjoiY2wwN3RzZThnMDF3czNjbzFndnNrZ3h4OCJ9.xuaKaO_7XzSqiIBCAvcT7w",
+      mapStyle: "mapbox://styles/mapbox/streets-v11",
       mapMarkerListe: [],
 
       apiKey: process.env.VUE_APP_GEOCODING,
@@ -94,11 +96,11 @@ export default {
 
     //Websockets schauen ob sie am Localhost oder auf Heroku verwendet werden
     let email = this.aktiverUser.email;
-    email = email.replace('@', '|');
+    email = email.replace("@", "|");
     if (process.env.VUE_APP_WebSocketOfflineMode) {
       this.ws = new WebSocket(this.ws_serverAdress, email);
     } else {
-      let HOST = location.origin.replace(/^https/, 'wss');
+      let HOST = location.origin.replace(/^https/, "wss");
       this.ws = new WebSocket(HOST);
     }
   },
@@ -112,40 +114,40 @@ export default {
       // only the end or destination will change
       const query = await fetch(
         `https://api.mapbox.com/directions/v5/mapbox/walking/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${this.mapAccessToken}`,
-        { method: 'GET' },
+        { method: "GET" }
       );
       const json = await query.json();
       const data = json.routes[0];
       const route = data.geometry.coordinates;
       const geojson = {
-        type: 'Feature',
+        type: "Feature",
         properties: {},
         geometry: {
-          type: 'LineString',
+          type: "LineString",
           coordinates: route,
         },
       };
       // if the route already exists on the map, we'll reset it using setData
-      if (this.map.getSource('route')) {
-        this.map.getSource('route').setData(geojson);
+      if (this.map.getSource("route")) {
+        this.map.getSource("route").setData(geojson);
       }
       // otherwise, we'll make a new request
       else {
         this.map.addLayer({
-          id: 'route',
-          type: 'line',
+          id: "route",
+          type: "line",
           source: {
-            type: 'geojson',
+            type: "geojson",
             data: geojson,
           },
           layout: {
-            'line-join': 'round',
-            'line-cap': 'round',
+            "line-join": "round",
+            "line-cap": "round",
           },
           paint: {
-            'line-color': '#3887be',
-            'line-width': 5,
-            'line-opacity': 0.75,
+            "line-color": "#3887be",
+            "line-width": 5,
+            "line-opacity": 0.75,
           },
         });
       }
@@ -162,13 +164,16 @@ export default {
       const start = [this.centerPosition.lng, this.centerPosition.lat];
       //Für Route:
       // const start = [this.centerPosition.lat, this.centerPosition.lng];
-      this.closestPol = findPolizeistation(this.centerPosition.lat, this.centerPosition.lng);
+      this.closestPol = findPolizeistation(
+        this.centerPosition.lat,
+        this.centerPosition.lng
+      );
       let cx = this.closestPol.station.X;
       let cy = this.closestPol.station.Y;
 
       console.log(this.closestPol);
-      cx = cx.replace(',', '.');
-      cy = cy.replace(',', '.');
+      cx = cx.replace(",", ".");
+      cy = cy.replace(",", ".");
 
       cx = Number(cx);
       cy = Number(cy);
@@ -181,18 +186,18 @@ export default {
 
       // Add starting point to the map
       this.map.addLayer({
-        id: 'point',
-        type: 'circle',
+        id: "point",
+        type: "circle",
         source: {
-          type: 'geojson',
+          type: "geojson",
           data: {
-            type: 'FeatureCollection',
+            type: "FeatureCollection",
             features: [
               {
-                type: 'Feature',
+                type: "Feature",
                 properties: {},
                 geometry: {
-                  type: 'Point',
+                  type: "Point",
                   coordinates: start,
                 },
               },
@@ -200,41 +205,41 @@ export default {
           },
         },
         paint: {
-          'circle-radius': 10,
-          'circle-color': '#3887be',
+          "circle-radius": 10,
+          "circle-color": "#3887be",
         },
       });
 
       const coords = [cx, cy];
       const end = {
-        type: 'FeatureCollection',
+        type: "FeatureCollection",
         features: [
           {
-            type: 'Feature',
+            type: "Feature",
             properties: {},
             geometry: {
-              type: 'Point',
+              type: "Point",
               coordinates: coords,
             },
           },
         ],
       };
-      if (this.map.getLayer('end')) {
-        this.map.getSource('end').setData(end);
+      if (this.map.getLayer("end")) {
+        this.map.getSource("end").setData(end);
       } else {
         this.map.addLayer({
-          id: 'end',
-          type: 'circle',
+          id: "end",
+          type: "circle",
           source: {
-            type: 'geojson',
+            type: "geojson",
             data: {
-              type: 'FeatureCollection',
+              type: "FeatureCollection",
               features: [
                 {
-                  type: 'Feature',
+                  type: "Feature",
                   properties: {},
                   geometry: {
-                    type: 'Point',
+                    type: "Point",
                     coordinates: coords,
                   },
                 },
@@ -242,15 +247,15 @@ export default {
             },
           },
           paint: {
-            'circle-radius': 10,
-            'circle-color': '#f30',
+            "circle-radius": 10,
+            "circle-color": "#f30",
           },
         });
       }
       this.getRoute(coords);
 
       const obj = {
-        type: 'Alarm',
+        type: "Alarm",
         user: this.$store.state.aktiverUser,
       };
 
@@ -281,7 +286,7 @@ export default {
       //Map-Initialisieren
       mapbox.accessToken = this.mapAccessToken;
       this.map = new mapbox.Map({
-        container: 'map', // container ID
+        container: "map", // container ID
         style: this.mapStyle, // style URL
         center: [this.centerPosition.lng, this.centerPosition.lat],
         zoom: 13, // starting zoom
@@ -292,25 +297,25 @@ export default {
     startStopTracker() {
       if (!this.started) {
         this.started = true;
-        this.text = 'Stop Tracker';
+        this.text = "Stop Tracker";
         this.interval = setInterval(this.track, 2500);
       } else {
         this.started = false;
         this.alarmStarted = false;
-        this.text = 'Start Tracker';
+        this.text = "Start Tracker";
         //Marker löschen
         this.deleteAllMarkers();
         clearInterval(this.interval);
 
         //Layers löschen
-        this.map.removeLayer('route');
-        this.map.removeSource('route');
+        this.map.removeLayer("route");
+        this.map.removeSource("route");
 
-        this.map.removeLayer('point');
-        this.map.removeSource('point');
+        this.map.removeLayer("point");
+        this.map.removeSource("point");
 
-        this.map.removeLayer('end');
-        this.map.removeSource('end');
+        this.map.removeLayer("end");
+        this.map.removeSource("end");
       }
     },
 
@@ -327,7 +332,7 @@ export default {
         } = await getCoordinates();
 
         let standortDaten = await axios.get(
-          `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapbox.accessToken}`,
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapbox.accessToken}`
         );
         const standort = standortDaten.data.features[0].place_name;
         console.log(standort);
@@ -337,12 +342,14 @@ export default {
 
         //Neuen (einzigen) Marker generieren
         const marker1 = new mapbox.Marker({
-          anchor: 'center',
-          color: '#03C04A',
+          anchor: "center",
+          color: "#03C04A",
         })
           .setLngLat([lng, lat])
           .addTo(this.map)
-          .setPopup(new mapbox.Popup().setHTML(`<p>Deine Position: ${standort} </p>`)); // add popup
+          .setPopup(
+            new mapbox.Popup().setHTML(`<p>Deine Position: ${standort} </p>`)
+          ); // add popup
         this.mapMarkerListe.push(marker1);
 
         //Center-Position neu setzen und Map zentrieren
@@ -367,7 +374,7 @@ export default {
 
         this.ws.send(JSON.stringify(position));
       } else {
-        alert('Dieser Browser unterstützt die Abfrage der Geolocation nicht.');
+        alert("Dieser Browser unterstützt die Abfrage der Geolocation nicht.");
       }
     },
   },
@@ -385,5 +392,30 @@ export default {
   background-color: #fff;
   overflow-y: scroll;
   font-family: sans-serif;
+}
+.chs-button {
+  background-color: rgba(255, 0, 0, 0) !important;
+  box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2),
+    0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 0px 0px rgba(0, 0, 0, 0.12) !important;
+  border: 2px solid #000000;
+  border-radius: 20px;
+}
+.chs-button:hover {
+  background-color: rgb(0, 0, 0) !important;
+  color: white !important;
+  transition: all 0.5s;
+}
+.chs-button-red {
+  background-color: rgba(255, 0, 0, 0) !important;
+  box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2),
+    0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 0px 0px rgba(0, 0, 0, 0.12) !important;
+  border: 2px solid #ff0000;
+  border-radius: 20px;
+  color: red !important;
+}
+.chs-button-red:hover {
+  background-color: red !important;
+  color: white !important;
+  transition: all 0.5s;
 }
 </style>

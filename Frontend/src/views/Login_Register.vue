@@ -17,11 +17,11 @@
 </template>
 
 <script>
-import Login from '../components/Login';
-import Register from '../components/Register';
+import Login from "../components/Login";
+import Register from "../components/Register";
 
 export default {
-  name: 'Login_Register',
+  name: "Login_Register",
   data() {
     return {
       everLoggedIn: false,
@@ -33,8 +33,8 @@ export default {
   },
   created() {
     try {
-      const l = localStorage.getItem('everLoggedIn');
-      if (l == 'true') {
+      const l = localStorage.getItem("everLoggedIn");
+      if (l == "true") {
         this.everLoggedIn = true;
       } else {
         this.everLoggedIn = false;
@@ -45,7 +45,7 @@ export default {
   },
   methods: {
     toMap() {
-      this.$router.push({ name: 'Map' });
+      this.$router.push({ name: "Map" });
     },
   },
 };
