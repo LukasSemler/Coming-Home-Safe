@@ -1,5 +1,6 @@
 <template>
   <v-container>
+    <!--UserInteraktionen-->
     <v-row>
       <v-col class="text-right">
         <!--Passwort wechseln-->
@@ -54,7 +55,7 @@
     </v-row>
 
     <!--Google Maps Component-->
-    <userMap />
+    <userMap :logoutClickedStatus="logoutClickedStatus" />
 
     <!--Alert-->
     <v-row justify="center" class="mt-3" style="position: sticky; bottom: 2%">
@@ -86,11 +87,17 @@ export default {
       changePw_Alert_Color: null,
       changePw_Alert_Text: '',
       changePw_Alert_Type: '',
+      logoutClickedStatus: false,
     };
   },
+
   components: { userMap },
+
   methods: {
     async abmelden() {
+      //Der Usermap sagen, dass WS-Verbindung getrennt werden soll
+      this.logoutClickedStatus();
+
       //WIchtig um sessin zu beenden
       await axios.get(`${this.serverAdress}/abmelden`);
 
