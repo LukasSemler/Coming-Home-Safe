@@ -69,7 +69,8 @@ export default {
       interval: "",
 
       ws: null,
-      ws_serverAdress: "ws://localhost:2410",
+      // ws_serverAdress: "ws://localhost:2410",
+      ws_serverAdress: "wss://coming-home-safe.herokuapp.com",
 
       //Map
       map: null,

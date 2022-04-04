@@ -54,7 +54,7 @@ const smtpTransport = nodemailer.createTransport({
 //#region -----------Offizielle Funktionen-----------
 //Datenbankverbindung herstellen
 function DatenbankVerbinden() {
-  // //Development
+//   // //Development
   aktiverClient = new Pool({
     user: 'postgres',
     host: 'localhost',
@@ -63,7 +63,7 @@ function DatenbankVerbinden() {
     port: 5432,
   });
 
-  //Production
+  // Production
   // aktiverClient = new Pool({
   //   connectionString: process.env.DATABASE_URL,
   //   ssl: {

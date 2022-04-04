@@ -17,6 +17,7 @@ function wsServer(httpServer) {
     //Wenn der WebsocketServer Nachrichten bekommt
     ws.on('message', (data) => {
       const bekommen = JSON.parse(data);
+      console.log(bekommen);
       connections.forEach((elem) => elem.ws.send(JSON.stringify(bekommen)));
     });
 
