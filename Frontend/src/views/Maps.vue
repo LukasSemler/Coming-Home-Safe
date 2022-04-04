@@ -96,7 +96,7 @@ export default {
   methods: {
     async abmelden() {
       //Der Usermap sagen, dass WS-Verbindung getrennt werden soll
-      this.logoutClickedStatus();
+      this.logoutClickedStatus = true;
 
       //WIchtig um sessin zu beenden
       await axios.get(`${this.serverAdress}/abmelden`);

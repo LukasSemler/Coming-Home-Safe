@@ -93,9 +93,10 @@ export default {
   },
 
   watch: {
-    logoutClickedStatus: function (newVar, oldVar) {
+    logoutClickedStatus(newVar, oldVar) {
       //Wenn Sich User ausloggt und der Tracker an ist, vom Websocket trennen
       if (newVar && this.started) {
+        console.log('Stopped');
         this.startStopTracker();
       }
     },
