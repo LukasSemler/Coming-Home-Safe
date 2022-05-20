@@ -65,10 +65,13 @@ export default {
       text: 'Start Tracker',
 
       ws: null,
-      // ws_serverAdress: "ws://localhost:2410",
-      ws_serverAdress: 'wss://coming-home-safe.herokuapp.com',
+      ws_serverAdress: 'ws://localhost:2410',
+      // ws_serverAdress: 'wss://coming-home-safe.herokuapp.com',
       locationSingleUser: [],
       users: {},
+
+      aktiverUser: this.$store.state.aktiverUser,
+
       //? Neu
       multiUser: [],
       currentPos: null,
@@ -91,6 +94,7 @@ export default {
   },
 
   async created() {
+    //TODO DAS WIRD DANN ÜBERARBEITET
     //Websockets schauen ob sie am Localhost oder auf Heroku verwendet werden
     if (process.env.VUE_APP_WebSocketOfflineMode) {
       this.ws = new WebSocket(this.ws_serverAdress);
@@ -98,13 +102,11 @@ export default {
       let HOST = location.origin.replace(/^https/, 'wss');
       this.ws = new WebSocket(HOST);
     }
-
     //Wenn Nachrichten von Websocket kommen
-    this.ws.onmessage = ({ data }) => {
-      let bekommen = JSON.parse(data);
+    this.ws.onmessage = (data) => {
+      let { type, bekommen } = JSON.parse(data);
       console.log('Message bekommen: ', bekommen);
       this.currentPos = bekommen;
-
       //Messages von WS zu Admin
       if (bekommen.type == 'userLeft') {
         //? user welcher gegangen ist entfernen
@@ -128,7 +130,6 @@ export default {
             lng: bekommen.lng,
             markerFarbe: this.markerFarbe(),
           });
-
           //? Neuen Marker erstellen
           const marker = new mapbox.Marker({
             anchor: 'center',
@@ -137,7 +138,6 @@ export default {
             .setLngLat([bekommen.lng, bekommen.lat])
             .addTo(this.map)
             .setPopup(new mapbox.Popup().setHTML(`<p>Deine Position: ${bekommen.adresse} </p>`));
-
           this.mapMarkerListe.push({ marker, user: bekommen.user });
         } else {
           this.multiUser.forEach((elem) => {
@@ -147,7 +147,6 @@ export default {
               gefunden.adresse = bekommen.adresse;
               gefunden.lat = bekommen.lat;
               gefunden.lng = bekommen.lng;
-
               //? Alten Marker vom user löschen
               this.mapMarkerListe.forEach((elem) => {
                 //? Marker vom user finden
@@ -156,11 +155,9 @@ export default {
                   const userIndex = this.mapMarkerListe.findIndex(
                     (x) => x.user.email == bekommen.user.email,
                   );
-
                   //? marker aus Arry und Karte entfernen
                   this.mapMarkerListe.splice(userIndex, 1);
                   elem.marker.remove();
-
                   // //? Neuen marker erstellen
                   const marker = new mapbox.Marker({
                     anchor: 'center',
@@ -171,7 +168,6 @@ export default {
                     .setPopup(
                       new mapbox.Popup().setHTML(`<p>Deine Position: ${gefunden.adresse} </p>`),
                     ); // add popup
-
                   //? Neuen Marker mit User im Array speichern
                   this.mapMarkerListe.push({ marker, user: gefunden.user });
                 }
@@ -179,7 +175,6 @@ export default {
             }
           });
         }
-
         this.locationSingleUser = [
           {
             lat: bekommen.lat,
@@ -187,7 +182,6 @@ export default {
             lable: 'Current Position User 1',
           },
         ];
-
         this.lat = bekommen.lat;
         this.long = bekommen.lng;
       }
@@ -195,6 +189,20 @@ export default {
   },
 
   async mounted() {
+    console.log('In der AdminMap');
+
+    //Mit WS verbinden
+    this.connectToWs();
+
+    setInterval(() => {
+      console.log(`Status: ${this.ws.readyState}`);
+    }, 1000);
+
+    //Wenn Nachrichten von Websocket kommen
+    this.ws.addEventListener('message', (event) => {
+      console.log(event);
+    });
+
     //Map-Initialisieren
     //Aktuellen Standort holen
     let getCoordinates = () =>
@@ -217,6 +225,28 @@ export default {
   },
 
   methods: {
+    //Mit WS Verbindung herstellen
+    connectToWs() {
+      let email = this.aktiverUser.email;
+      email = email.replace('@', '|');
+      if (process.env.VUE_APP_WebSocketOfflineMode) {
+        this.ws = new WebSocket(this.ws_serverAdress, email);
+      } else {
+        let HOST = location.origin.replace(/^https/, 'wss');
+        this.ws = new WebSocket(HOST, email);
+      }
+      //Reconnect wenn die Verbindung geschlossen wird
+      this.ws.addEventListener('close', (event) => {
+        this.ws.close();
+        this.ws = null;
+        this.connectToWs();
+      });
+
+      this.ws.addEventListener('message', (event) => {
+        console.log(event);
+      });
+    },
+
     markerFarbe() {
       return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
     },
@@ -236,6 +266,7 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .chs-button {
   background-color: rgba(255, 0, 0, 0) !important;

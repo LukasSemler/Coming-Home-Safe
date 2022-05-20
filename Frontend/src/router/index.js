@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Login_Register from '../views/Login_Register.vue';
-import Map from '../views/Maps';
+import userMap from '../views/userMap.vue';
 import adminMap from '../views/adminMap';
 import adminPanel from '../views/adminPanel.vue';
 import store from '../store';
@@ -15,9 +15,9 @@ const routes = [
     component: Login_Register,
   },
   {
-    path: '/Map',
-    name: 'Map',
-    component: Map,
+    path: '/userMap',
+    name: 'userMap',
+    component: userMap,
     //Schauen ob user angemeldet ist
     beforeEnter: (to, from, next) => {
       if (store.getters.isAktiverUserVorhanden) next();

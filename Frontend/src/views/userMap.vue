@@ -1,4 +1,5 @@
 <template>
+
   <v-container>
     <!--UserInteraktionen-->
     <v-row>
@@ -101,10 +102,10 @@ export default {
       //WIchtig um sessin zu beenden
       await axios.get(`${this.serverAdress}/abmelden`);
 
-      //Kunden aus Store löschen
+      // Kunden aus Store löschen
       this.$store.dispatch('LogoutKunde');
 
-      //Zurück zur Startseite
+      // Zurück zur Startseite
       this.$router.push('/');
     },
 

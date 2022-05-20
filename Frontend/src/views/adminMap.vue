@@ -1,23 +1,23 @@
 <template>
-	<v-container>
-		<h1 class="text-center">Admin Map View</h1>
-		<br />
-		<v-row>
-			<v-col class="text-right">
-				<v-btn outlined text class="red accent-3 justify-right" @click="abmelden"> Abmelden </v-btn>
-			</v-col>
-			<v-col v-if="this.$store.state.aktiverUser.superUser" class="text-right">
-				<v-btn outlined text class="red accent-3 justify-right" @click="changeAdminPanel">
-					Zum Admin Panel
-				</v-btn>
-			</v-col>
+  <v-container>
+    <h1 class="text-center">Admin Map View</h1>
+    <br />
+    <v-row>
+      <v-col class="text-right">
+        <v-btn outlined text class="red accent-3 justify-right" @click="abmelden"> Abmelden </v-btn>
+      </v-col>
+      <v-col v-if="this.$store.state.aktiverUser.superUser" class="text-right">
+        <v-btn outlined text class="red accent-3 justify-right" @click="changeAdminPanel">
+          Zum Admin Panel
+        </v-btn>
+      </v-col>
       <div v-else>
-          <h1>Else</h1>
+        <h1>Else</h1>
       </div>
-		</v-row>
-		<br />
-		<adminMap />
-	</v-container>
+    </v-row>
+    <br />
+    <adminMap />
+  </v-container>
 </template>
 
 <script>

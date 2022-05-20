@@ -1,5 +1,3 @@
-importScripts("/precache-manifest.bfaca9aad36d69a70052df98eab6a52b.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
-
 //Wichtige Imports oder Variablen
 
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js');
@@ -96,4 +94,3 @@ async function track() {
 //Precache
 self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
-

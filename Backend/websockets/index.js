@@ -2,7 +2,7 @@ const Websocket = require('ws');
 const url = require('url');
 
 //WebsocketVariablen
-connections = [];
+let connections = [];
 
 function wsServer(httpServer) {
   const wss = new Websocket.Server({ server: httpServer });
@@ -11,25 +11,43 @@ function wsServer(httpServer) {
     email = email.replace('|', '@');
 
     connections.push({ ws, email });
-    console.log(connections);
-    console.log(connections.length);
 
     //Wenn der WebsocketServer Nachrichten bekommt
     ws.on('message', (data) => {
-      const bekommen = JSON.parse(data);
-      console.log(bekommen);
-      connections.forEach((elem) => elem.ws.send(JSON.stringify(bekommen)));
+      const { daten: positionData, type } = JSON.parse(data);
+
+      //Auf Nachrichten richtig Reagieren
+      switch (type) {
+        case 'sendPosition':
+          console.log(`Nachrichtentyp: ${type} --> IM CASE`);
+          connections.forEach((elem) =>
+            elem.ws.send(JSON.stringify({ type: 'getPosition', data: positionData })),
+          );
+          break;
+        default:
+          console.log(`Nachrichtentyp: ${type} nicht defined (SWITCH IN websocket)`);
+          break;
+      }
     });
 
+    //Wenn sich der User vom Websocket trennt
     ws.on('close', () => {
-      const leftUser = connections.find((elem) => elem.ws == ws);
       connections = connections.filter((elem) => elem.ws != ws);
       console.log('User left');
       connections.forEach((elem) =>
-        elem.ws.send(JSON.stringify({ type: 'userLeft', payload: leftUser.email })),
+        elem.ws.send(
+          JSON.stringify({
+            type: 'userLeft',
+            data: connections.find((elem) => elem.ws == ws).email,
+          }),
+        ),
       );
     });
   });
 }
+
+setInterval(() => {
+  console.log('Länge: ' + connections.length);
+}, 1000);
 
 module.exports = { wsServer };

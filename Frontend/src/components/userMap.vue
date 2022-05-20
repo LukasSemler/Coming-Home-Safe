@@ -64,7 +64,6 @@ export default {
 
       text: 'Start Tracker',
       started: false,
-      interval: '',
 
       ws: null,
       ws_serverAdress: 'ws://localhost:2410',
@@ -75,8 +74,6 @@ export default {
         'pk.eyJ1IjoiY29taW5naG9tZXNhZmUiLCJhIjoiY2wwN3RzZThnMDF3czNjbzFndnNrZ3h4OCJ9.xuaKaO_7XzSqiIBCAvcT7w',
       mapStyle: 'mapbox://styles/mapbox/streets-v11',
       mapMarkerListe: [],
-
-      apiKey: process.env.VUE_APP_GEOCODING,
 
       closestPol: null,
 
@@ -96,82 +93,70 @@ export default {
     logoutClickedStatus(newVar, oldVar) {
       //Wenn Sich User ausloggt und der Tracker an ist, vom Websocket trennen
       if (newVar && this.started) {
-        console.log('Stopped');
         this.startStopTracker();
       }
+
+      //WebsocketVerbindung löschen
+      this.disconnectFromWs();
     },
   },
 
   mounted() {
     //Richtet jetzige Position und Map ein
-    this.setLocationLatLngAndMap();
+    this.centerMap();
 
-    //Websockets schauen ob sie am Localhost oder auf Heroku verwendet werden
-    let email = this.aktiverUser.email;
-    email = email.replace('@', '|');
-    if (process.env.VUE_APP_WebSocketOfflineMode) {
-      this.ws = new WebSocket(this.ws_serverAdress, email);
-    } else {
-      let HOST = location.origin.replace(/^https/, 'wss');
-      this.ws = new WebSocket(HOST);
-    }
+    //ServiceWorker mit WS verbinden lassen
+    this.connectToWs();
+
+    //Reload unterbinden
+    window.addEventListener('beforeunload', (event) => {
+      //Von Websocket Verbindung trennen
+      this.disconnectFromWs();
+    });
   },
 
   methods: {
-    //Route berechnen
-    async getRoute(end) {
-      const start = [this.centerPosition.lng, this.centerPosition.lat];
-      // make a directions request using cycling profile
-      // an arbitrary start will always be the same
-      // only the end or destination will change
-      const query = await fetch(
-        `https://api.mapbox.com/directions/v5/mapbox/walking/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${this.mapAccessToken}`,
-        { method: 'GET' },
-      );
-      const json = await query.json();
-      const data = json.routes[0];
-      const route = data.geometry.coordinates;
-      const geojson = {
-        type: 'Feature',
-        properties: {},
-        geometry: {
-          type: 'LineString',
-          coordinates: route,
-        },
-      };
-      // if the route already exists on the map, we'll reset it using setData
-      if (this.map.getSource('route')) {
-        this.map.getSource('route').setData(geojson);
+    //Mit WS Verbindung herstellen
+    connectToWs() {
+      //Je nach Offline oder Onlinemode entscheiden und WebsocketPfad umbauen
+
+      //WebsocketAdresse auf WSS ändern wenn HTTPS
+      if (window.location.protocol == 'https') {
+        this.ws_serverAdress == `wss://localhost:${process.env.PORT}`;
       }
-      // otherwise, we'll make a new request
-      else {
-        this.map.addLayer({
-          id: 'route',
-          type: 'line',
-          source: {
-            type: 'geojson',
-            data: geojson,
-          },
-          layout: {
-            'line-join': 'round',
-            'line-cap': 'round',
-          },
-          paint: {
-            'line-color': '#3887be',
-            'line-width': 5,
-            'line-opacity': 0.75,
-          },
-        });
-      }
-      // Routenanweisung
-      const steps = data.legs[0].steps;
-      for (const step of steps) {
-        this.routenAnweisungen.push(step.maneuver.instruction);
-      }
-      this.dauerRoute = Math.floor(data.duration / 60);
+
+      //ServiceWorker sagen, dass er sich verbinden soll
+      navigator.serviceWorker.ready.then((registration) => {
+        registration.active.postMessage(
+          JSON.stringify({
+            type: 'connect',
+            payload: { wsAdresse: this.ws_serverAdress, email: this.aktiverUser.email },
+          }),
+        );
+      });
+
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        const { type, payload } = JSON.parse(event.data);
+
+        console.log(`Type: ${type} Payload: ${payload}`);
+      });
     },
-    //____________________________________________________________________
+
+    //Mit WS Verbindung trennen
+    disconnectFromWs() {
+      navigator.serviceWorker.ready.then((registration) => {
+        registration.active.postMessage(
+          JSON.stringify({
+            type: 'disconnect',
+            payload: 'disconnectPayload',
+          }),
+        );
+      });
+    },
+
+    //Näheste Polizeistation aufsuchen und Route setzen
     sendAlarm() {
+      if (this.alarmStarted) return;
       this.alarmStarted = true;
       const start = [this.centerPosition.lng, this.centerPosition.lat];
       //Für Route:
@@ -271,6 +256,7 @@ export default {
       this.ws.send(JSON.stringify(obj));
     },
 
+    //Löscht alle Marker auf der Map
     deleteAllMarkers() {
       this.mapMarkerListe.forEach((element) => {
         element.remove();
@@ -278,7 +264,7 @@ export default {
     },
 
     //Beim Start Dinge initialisieren
-    async setLocationLatLngAndMap() {
+    async centerMap() {
       //Aktuellen Standort bekommen
       let getCoordinates = () =>
         new Promise(function (resolve, reject) {
@@ -305,41 +291,111 @@ export default {
     //Button-Event für Tracker
     startStopTracker() {
       if (!this.started) {
+        //Button anpassen
         this.started = true;
         this.text = 'Stop Tracker';
-        this.interval = setInterval(this.track, 2500);
+
+        //Track-Intervall starten über SW
+        navigator.serviceWorker.ready.then((registration) => {
+          registration.active.postMessage(
+            JSON.stringify({
+              type: 'startTracking',
+              payload: 'Tracking Soll Starten!',
+            }),
+          );
+        });
       } else {
+        //Marker löschen
+        this.deleteAllMarkers();
+
+        //Track-Intervall ausschalten
+        navigator.serviceWorker.ready.then((registration) => {
+          registration.active.postMessage(
+            JSON.stringify({
+              type: 'stopTracking',
+              payload: 'Tracking Soll Stoppen!',
+            }),
+          );
+        });
+
+        //AlarmRoute-löschen
+        if (this.alarmStarted) {
+          this.map.removeLayer('route');
+          this.map.removeSource('route');
+
+          this.map.removeLayer('point');
+          this.map.removeSource('point');
+
+          this.map.removeLayer('end');
+          this.map.removeSource('end');
+        }
+
+        //Button zurücksetzen
         this.started = false;
         this.alarmStarted = false;
         this.text = 'Start Tracker';
-        //Marker löschen
-        this.deleteAllMarkers();
-        clearInterval(this.interval);
-
-        //Layers löschen
-        this.map.removeLayer('route');
-        this.map.removeSource('route');
-
-        this.map.removeLayer('point');
-        this.map.removeSource('point');
-
-        this.map.removeLayer('end');
-        this.map.removeSource('end');
       }
     },
 
+    //Route berechnen
+    async getRoute(end) {
+      const start = [this.centerPosition.lng, this.centerPosition.lat];
+      // make a directions request using cycling profile
+      // an arbitrary start will always be the same
+      // only the end or destination will change
+      const query = await fetch(
+        `https://api.mapbox.com/directions/v5/mapbox/walking/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${this.mapAccessToken}`,
+        { method: 'GET' },
+      );
+      const json = await query.json();
+      const data = json.routes[0];
+      const route = data.geometry.coordinates;
+      const geojson = {
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'LineString',
+          coordinates: route,
+        },
+      };
+      // if the route already exists on the map, we'll reset it using setData
+      if (this.map.getSource('route')) {
+        this.map.getSource('route').setData(geojson);
+      }
+      // otherwise, we'll make a new request
+      else {
+        this.map.addLayer({
+          id: 'route',
+          type: 'line',
+          source: {
+            type: 'geojson',
+            data: geojson,
+          },
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round',
+          },
+          paint: {
+            'line-color': '#3887be',
+            'line-width': 5,
+            'line-opacity': 0.75,
+          },
+        });
+      }
+      // Routenanweisung
+      const steps = data.legs[0].steps;
+      for (const step of steps) {
+        this.routenAnweisungen.push(step.maneuver.instruction);
+      }
+      this.dauerRoute = Math.floor(data.duration / 60);
+    },
+
+    //Sendet bekommen Daten uns sendet zum WSS
     async track() {
+      //TODO lng & lat müssen übergeben werden
+
       if (navigator.geolocation) {
-        //Aktueller Standort wird abgefragt
-        let getCoordinates = () =>
-          new Promise(function (resolve, reject) {
-            navigator.geolocation.getCurrentPosition(resolve, reject);
-          });
-
-        let {
-          coords: { latitude: lat, longitude: lng },
-        } = await getCoordinates();
-
+        //Coordinaten werden eingesetzt!
         let standortDaten = await axios.get(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapbox.accessToken}`,
         );
@@ -379,7 +435,8 @@ export default {
           adresse: standort,
         };
 
-        this.ws.send(JSON.stringify(position));
+        //WebSocket Daten schicken
+        this.ws.send(JSON.stringify({ type: 'sendPosition', position }));
       } else {
         alert('Dieser Browser unterstützt die Abfrage der Geolocation nicht.');
       }

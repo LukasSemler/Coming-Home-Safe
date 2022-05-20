@@ -108,8 +108,8 @@ export default {
   data() {
     return {
       serverAdress: process.env.VUE_APP_SERVER_ADRESS,
-      email: "",
-      passwort: "",
+      email: "benjamin@stauf.at",
+      passwort: "Benni",
       showPasswordInput: false,
       showPasswortVergessen: false,
       validLogin: true,
@@ -195,7 +195,7 @@ export default {
           this.$store.dispatch("LoginKunde", foundUser);
 
           //Zur Map weiterleiten
-          this.$router.push("/map");
+          this.$router.push("/usermap");
         }
         //AdminUser
         else if (status == 200 && code != "kein Admin") {
