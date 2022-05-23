@@ -1,4 +1,4 @@
-importScripts("/precache-manifest.3b275f84a01a521f6f6b02b588dbbaf2.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
+importScripts("/precache-manifest.b9617dfc11da4da2764b30829eeec71c.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 //Wichtige Imports oder Variablen
 
@@ -25,7 +25,6 @@ self.addEventListener('message', (event) => {
       email = email.replace('@', '|');
       //Verbindung herstellen
       ws = new WebSocket(wsAdresse, email);
-      
 
       //TODO TESTMESSAGE AN DEN CLIENT
       event.source.postMessage(
@@ -40,7 +39,7 @@ self.addEventListener('message', (event) => {
       console.log('get user position...');
 
       //Websocket daten schicken
-      ws.send(JSON.stringify({type: 'sendPosition', daten: payload}))
+      ws.send(JSON.stringify({ type: 'sendPosition', daten: payload }));
 
       break;
 
@@ -53,8 +52,6 @@ self.addEventListener('message', (event) => {
 });
 
 //---Funktionen---
-
-
 
 //Precache
 self.__precacheManifest = [].concat(self.__precacheManifest || []);

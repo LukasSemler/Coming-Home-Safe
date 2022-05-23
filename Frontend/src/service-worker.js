@@ -23,7 +23,6 @@ self.addEventListener('message', (event) => {
       email = email.replace('@', '|');
       //Verbindung herstellen
       ws = new WebSocket(wsAdresse, email);
-      
 
       //TODO TESTMESSAGE AN DEN CLIENT
       event.source.postMessage(
@@ -38,7 +37,7 @@ self.addEventListener('message', (event) => {
       console.log('get user position...');
 
       //Websocket daten schicken
-      ws.send(JSON.stringify({type: 'sendPosition', daten: payload}))
+      ws.send(JSON.stringify({ type: 'sendPosition', daten: payload }));
 
       break;
 
@@ -51,8 +50,6 @@ self.addEventListener('message', (event) => {
 });
 
 //---Funktionen---
-
-
 
 //Precache
 self.__precacheManifest = [].concat(self.__precacheManifest || []);

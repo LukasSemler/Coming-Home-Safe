@@ -16,10 +16,13 @@ function wsServer(httpServer) {
     ws.on('message', (data) => {
       const { daten: positionData, type } = JSON.parse(data);
 
+      console.log('TYPEEEEEE: ' + type);
+
       //Auf Nachrichten richtig Reagieren
       switch (type) {
         case 'sendPosition':
           console.log(`Nachrichtentyp: ${type} --> IM CASE`);
+
           connections.forEach((elem) =>
             elem.ws.send(JSON.stringify({ type: 'getPosition', data: positionData })),
           );
