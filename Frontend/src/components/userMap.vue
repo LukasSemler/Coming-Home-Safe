@@ -64,6 +64,7 @@ export default {
 
       text: 'Start Tracker',
       started: false,
+      trackIntervall: null,
 
       ws: null,
       ws_serverAdress: 'ws://localhost:2410',
@@ -295,28 +296,16 @@ export default {
         this.started = true;
         this.text = 'Stop Tracker';
 
-        //Track-Intervall starten über SW
-        navigator.serviceWorker.ready.then((registration) => {
-          registration.active.postMessage(
-            JSON.stringify({
-              type: 'startTracking',
-              payload: 'Tracking Soll Starten!',
-            }),
-          );
-        });
+        //Tracker-Intervall starten
+        this.trackIntervall = setInterval(this.track, 1000);
+
       } else {
         //Marker löschen
         this.deleteAllMarkers();
 
         //Track-Intervall ausschalten
-        navigator.serviceWorker.ready.then((registration) => {
-          registration.active.postMessage(
-            JSON.stringify({
-              type: 'stopTracking',
-              payload: 'Tracking Soll Stoppen!',
-            }),
-          );
-        });
+        clearInterval(this.trackIntervall);
+        this.trackIntervall = null;
 
         //AlarmRoute-löschen
         if (this.alarmStarted) {
@@ -390,11 +379,20 @@ export default {
       this.dauerRoute = Math.floor(data.duration / 60);
     },
 
-    //Sendet bekommen Daten uns sendet zum WSS
+    //Bekommt standort, setzt Positionsmarker und sendet zum websocket
     async track() {
-      //TODO lng & lat müssen übergeben werden
-
       if (navigator.geolocation) {
+      //Function gibt aktuelle Coordinaten zurück
+      let getCoordinates = () =>
+        new Promise(function (resolve, reject) {
+          navigator.geolocation.getCurrentPosition(resolve, reject);
+      });
+
+      //Aktuelle Standortkoordinaten abfragen
+      let {
+        coords: { latitude: lat, longitude: lng },
+      } = await getCoordinates();
+
         //Coordinaten werden eingesetzt!
         let standortDaten = await axios.get(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapbox.accessToken}`,
@@ -435,8 +433,16 @@ export default {
           adresse: standort,
         };
 
-        //WebSocket Daten schicken
-        this.ws.send(JSON.stringify({ type: 'sendPosition', position }));
+        //Standortpaket ServiceWorker schicken, der kümmert sich darum
+        navigator.serviceWorker.ready.then((registration) => {
+          registration.active.postMessage(
+            JSON.stringify({
+              type: 'position',
+              payload: position,
+            }),
+          );
+        });
+
       } else {
         alert('Dieser Browser unterstützt die Abfrage der Geolocation nicht.');
       }
