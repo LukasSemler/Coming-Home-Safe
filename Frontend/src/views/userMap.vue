@@ -80,7 +80,6 @@ export default {
   name: 'Map',
   data() {
     return {
-      serverAdress: process.env.VUE_APP_SERVER_ADRESS,
       changePwDialog: false,
       changePw_Password_1: '',
       changePw_Password_2: '',

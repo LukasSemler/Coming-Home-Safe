@@ -68,6 +68,7 @@ export default {
 
       ws: null,
       ws_serverAdress: 'ws://localhost:2410',
+      // ws_serverAdress: `wss://coming-home-safe.herokuapp.com`,
 
       //Map
       map: null,
@@ -119,12 +120,6 @@ export default {
   methods: {
     //Mit WS Verbindung herstellen
     connectToWs() {
-      //Je nach Offline oder Onlinemode entscheiden und WebsocketPfad umbauen
-
-      //WebsocketAdresse auf WSS ändern wenn HTTPS
-      if (!process.env.VUE_APP_WebSocketOfflineMode) {
-        this.ws_serverAdress == `wss://localhost:${process.env.PORT}`;
-      }
 
       //ServiceWorker sagen, dass er sich verbinden soll
       navigator.serviceWorker.ready.then((registration) => {

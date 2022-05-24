@@ -30,7 +30,7 @@ const smtpTransport = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     type: 'OAuth2',
-    user: 'comingHomeSafe.HTLWW@gmail.com',
+    user: 'benjamin.stauf11@gmail.com',
     clientId: process.env.CLIENTID,
     clientSecret: process.env.CLIENTSECRET,
     refreshToken: process.env.REFRESH_TOKEN,
@@ -192,6 +192,8 @@ async function RegisterToDatabase({
 
   //Datenbankverbindung trennen
   DatenbankTrennen();
+
+  return;
 }
 
 //--------Login----------
@@ -292,7 +294,7 @@ async function ChangeUserPassword(email, newPw) {
         } else {
           //DB-Verbindung trennen
           DatenbankTrennen();
-          resolve( false);
+          resolve(false);
         }
       },
     );

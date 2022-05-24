@@ -20,11 +20,7 @@
           <span class="text-h5">2 Faktor Authentication</span>
         </v-card-title>
         <v-card-text>
-          <v-otp-input
-            length="5"
-            class="my-3"
-            @finish="sumbitAdminLogin"
-          ></v-otp-input>
+          <v-otp-input length="5" class="my-3" @finish="sumbitAdminLogin"></v-otp-input>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -65,9 +61,7 @@
                     @click:append="showPasswordInput = !showPasswordInput"
                     :tabindex="-1"
                   ></v-text-field>
-                  <p
-                    class="light-blue--text text--accent-3 text-decoration-underline mt-3 pointer"
-                  >
+                  <p class="light-blue--text text--accent-3 text-decoration-underline mt-3 pointer">
                     Passwort vergessen
                   </p>
                 </v-col>
@@ -84,9 +78,7 @@
                 <v-col md="12">
                   <p>
                     get Back to
-                    <span
-                      @click="goToRegister"
-                      class="text-decoration-underline pointer"
+                    <span @click="goToRegister" class="text-decoration-underline pointer"
                       >Register</span
                     >
                   </p>
@@ -101,34 +93,33 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from 'axios';
 
 export default {
-  name: "Login",
+  name: 'Login',
   data() {
     return {
-      serverAdress: process.env.VUE_APP_SERVER_ADRESS,
-      email: "benjamin@stauf.at",
-      passwort: "Benni",
+      email: 'benjamin@stauf.at',
+      passwort: 'Benni',
       showPasswordInput: false,
       showPasswortVergessen: false,
       validLogin: true,
 
       dialog: false,
-      code: "",
+      code: '',
       foundUser: null,
 
-      errorText: "",
+      errorText: '',
       showError: false,
 
       rules: {
-        required: [(val) => (val || "").length > 0 || "This field is required"],
+        required: [(val) => (val || '').length > 0 || 'This field is required'],
         EmailRules: [
-          (value) => !!value || "This field is required.",
+          (value) => !!value || 'This field is required.',
           (value) => {
             const pattern =
               /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            return pattern.test(value) || "Invalid e-mail.";
+            return pattern.test(value) || 'Invalid e-mail.';
           },
         ],
       },
@@ -136,8 +127,8 @@ export default {
   },
   methods: {
     clearFelder() {
-      this.email = "";
-      this.passwort = "";
+      this.email = '';
+      this.passwort = '';
     },
     close() {
       this.dialog = false;
@@ -148,29 +139,29 @@ export default {
       //Schaut ob OTPinput-Code und gesendeter Code gleich ist
       if (otpInputCode == this.code) {
         //Ever logged-in im LS speichern
-        localStorage.setItem("everLoggedIn", true);
+        localStorage.setItem('everLoggedIn', true);
 
         //Aktiven Kunden im Store setzen
-        this.$store.dispatch("LoginKunde", this.foundUser);
+        this.$store.dispatch('LoginKunde', this.foundUser);
 
         //Zur Map weiterleiten
-        this.$router.push("/map");
+        this.$router.push('/map');
 
         //Schließt Dialog
         this.close();
         //Leitet zur Adminmap weiter
-        this.$router.push("/AdminMap");
+        this.$router.push('/AdminMap');
       } else {
         //gescheit Error meldung TODO:
-        console.log("something went wrong");
+        console.log('something went wrong');
       }
     },
 
     //Zu Register zu kommen
     goToRegister() {
       try {
-        localStorage.removeItem("everLoggedIn");
-        localStorage.setItem("everLoggedIn", false);
+        localStorage.removeItem('everLoggedIn');
+        localStorage.setItem('everLoggedIn', false);
         location.reload();
       } catch (error) {}
     },
@@ -187,18 +178,18 @@ export default {
         const { code, foundUser } = data;
 
         //Normaler User
-        if (status == 200 && code == "kein Admin") {
+        if (status == 200 && code == 'kein Admin') {
           //Ever logged-in im LS speichern
-          localStorage.setItem("everLoggedIn", true);
+          localStorage.setItem('everLoggedIn', true);
 
           //Aktiven Kunden im Store setzen
-          this.$store.dispatch("LoginKunde", foundUser);
+          this.$store.dispatch('LoginKunde', foundUser);
 
           //Zur Map weiterleiten
-          this.$router.push("/usermap");
+          this.$router.push('/usermap');
         }
         //AdminUser
-        else if (status == 200 && code != "kein Admin") {
+        else if (status == 200 && code != 'kein Admin') {
           //Code setzen
           this.code = code;
           //GefundenenUser setzen
@@ -210,16 +201,16 @@ export default {
         //Wenn user nicht vorhanden kommt ein alert
         this.showError = true;
         this.errorText =
-          "Der User ist leider nicht vorhanden. Bitte erstellen Sie einen Account oder geben Sie die richtigen Daten an.";
+          'Der User ist leider nicht vorhanden. Bitte erstellen Sie einen Account oder geben Sie die richtigen Daten an.';
 
         window.scrollTo({
           top: 0,
-          behavior: "smooth",
+          behavior: 'smooth',
         });
 
         setTimeout(() => {
           this.showError = false;
-          this.errorText = "";
+          this.errorText = '';
         }, 5000);
 
         this.clearFelder();
@@ -245,8 +236,8 @@ export default {
 }
 .chs-button {
   background-color: rgba(255, 0, 0, 0) !important;
-  box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2),
-    0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 0px 0px rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14),
+    0px 0px 0px 0px rgba(0, 0, 0, 0.12) !important;
   border: 2px solid #000000;
   border-radius: 20px;
 }

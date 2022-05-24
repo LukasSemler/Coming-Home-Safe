@@ -31,3 +31,7 @@ Content-Type: application/json
     "email": "benjamin@stauf.at",
     "passwort": "TestPW"
 }
+
+
+####
+GET http://localhost:2410/getUsers

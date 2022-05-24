@@ -27,7 +27,9 @@ export default {
 	name: 'Admin-Map',
 	components: { adminMap },
 	data() {
-		return { serverAdress: process.env.VUE_APP_SERVER_ADRESS };
+		return { 
+      
+     };
 	},
 	methods: {
 		async abmelden() {

@@ -18,10 +18,9 @@ Vue.use(VueGoogleMaps, {
 });
 
 //Base-URL axios
-if (process.env.NODE_ENV === 'development') {
-  axios.defaults.baseURL = 'http://localhost:2410'
+if (location.origin === 'http://localhost:8080') {
+  axios.defaults.baseURL = 'http://localhost:2410';
 }
-
 
 new Vue({
   router,

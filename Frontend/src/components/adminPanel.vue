@@ -36,7 +36,6 @@ export default {
   name: "adminPanel",
   data() {
     return {
-      serverAdress: process.env.VUE_APP_SERVER_ADRESS,
       users: [],
     };
   },
