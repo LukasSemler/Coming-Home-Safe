@@ -31,7 +31,7 @@ export default {
 	},
 	methods: {
 		async abmelden() {
-			await axios.get(`${this.serverAdress}/abmelden`);
+			await axios.get(`/abmelden`);
 			this.$router.push('/');
 
 			localStorage.removeItem(`login`);

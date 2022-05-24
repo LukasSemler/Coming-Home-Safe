@@ -4,16 +4,24 @@ import './registerServiceWorker';
 import router from './router';
 import store from './store';
 import vuetify from './plugins/vuetify';
+import axios from 'axios';
 import * as VueGoogleMaps from 'vue2-google-maps';
 
 Vue.config.productionTip = false;
 
+//! EIGENTLICH UNBRAUCHBAR WIR NUTZEN MAPBOX NICHT GOOGLE!
 Vue.use(VueGoogleMaps, {
   load: {
     key: 'AIzaSyCae4CWsdrdAYQ4LtnlX5Byhhfxfb7E5eA',
     libraries: 'places',
   },
 });
+
+//Base-URL axios
+if (process.env.NODE_ENV === 'development') {
+  axios.defaults.baseURL = 'http://localhost:2410'
+}
+
 
 new Vue({
   router,

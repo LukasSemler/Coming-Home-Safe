@@ -283,7 +283,7 @@ export default {
       if (passwordOTP_INPUT == this.gotAuthCode) {
         try {
           //User in Datenbank eintragen
-          axios.post(`${this.serverAdress}/registerToDb`, {
+          axios.post(`/registerToDb`, {
             vorname: this.Vorname,
             nachname: this.Nachname,
             email: this.Email,
@@ -317,7 +317,7 @@ export default {
         if (this.Passwort1 == this.Passwort2) {
           //Überprüfen ob Eingabefelder alle ausgefüllt wurden
           try {
-            let { data: code, status } = await axios.post(`${this.serverAdress}/registerGetAuth`, {
+            let { data: code, status } = await axios.post(`/registerGetAuth`, {
               email: this.Email,
               name: `${this.Vorname} ${this.Nachname}`,
             });

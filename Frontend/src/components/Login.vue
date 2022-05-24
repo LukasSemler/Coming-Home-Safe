@@ -179,7 +179,7 @@ export default {
       //Schaut ob der User ein Admin ist oder nicht, für richtige Weiterleitung (Map oder Adminmap)
       try {
         //Bekommt daten vom server (Gefundenen User und Code)
-        let { status, data } = await axios.post(`${this.serverAdress}/login`, {
+        let { status, data } = await axios.post(`/login`, {
           email: this.email,
           passwort: this.passwort,
         });

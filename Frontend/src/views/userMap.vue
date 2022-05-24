@@ -100,7 +100,7 @@ export default {
       this.logoutClickedStatus = true;
 
       //WIchtig um sessin zu beenden
-      await axios.get(`${this.serverAdress}/abmelden`);
+      await axios.get(`/abmelden`);
 
       // Kunden aus Store löschen
       this.$store.dispatch('LogoutKunde');
@@ -112,7 +112,7 @@ export default {
     async changePassword() {
       if (this.changePw_Password_1 == this.changePw_Password_2) {
         let { data: dataText, status } = await axios.patch(
-          `${this.serverAdress}/changeUserPasword/${this.$store.state.aktiverUser.email}`,
+          `/changeUserPasword/${this.$store.state.aktiverUser.email}`,
           { newPw: this.changePw_Password_1 },
         );
 

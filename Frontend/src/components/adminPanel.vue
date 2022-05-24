@@ -42,7 +42,7 @@ export default {
   },
   async created() {
     //Alle User bekommen um sie darzustellen
-    const res = await axios.get(`${this.serverAdress}/getUsers`);
+    const res = await axios.get(`/getUsers`);
     this.users = res.data;
   },
   methods: {
@@ -51,7 +51,7 @@ export default {
       user.isadmin = !user.isadmin;
 
       const res = await axios.patch(
-        `${this.serverAdress}/patchAdmin/${user.k_id}`,
+        `/patchAdmin/${user.k_id}`,
         {
           value: user.isadmin,
         }
