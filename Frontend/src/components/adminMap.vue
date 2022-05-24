@@ -194,18 +194,6 @@ export default {
   async mounted() {
     console.log('In der AdminMap');
 
-    // //Mit WS verbinden
-    // this.connectToWs();
-
-    // setInterval(() => {
-    //   console.log(`Status: ${this.ws.readyState}`);
-    // }, 1000);
-
-    // //Wenn Nachrichten von Websocket kommen
-    // this.ws.addEventListener('message', (event) => {
-    //   console.log(event);
-    // });
-
     //Map-Initialisieren
     //Aktuellen Standort holen
     let getCoordinates = () =>

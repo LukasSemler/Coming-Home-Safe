@@ -298,7 +298,6 @@ export default {
 
         //Tracker-Intervall starten
         this.trackIntervall = setInterval(this.track, 1000);
-
       } else {
         //Marker löschen
         this.deleteAllMarkers();
@@ -382,16 +381,19 @@ export default {
     //Bekommt standort, setzt Positionsmarker und sendet zum websocket
     async track() {
       if (navigator.geolocation) {
-      //Function gibt aktuelle Coordinaten zurück
-      let getCoordinates = () =>
-        new Promise(function (resolve, reject) {
-          navigator.geolocation.getCurrentPosition(resolve, reject);
-      });
+        //Function gibt aktuelle Coordinaten zurück
+        let getCoordinates = () =>
+          new Promise(function (resolve, reject) {
+            navigator.geolocation.getCurrentPosition(resolve, reject);
+          });
 
-      //Aktuelle Standortkoordinaten abfragen
-      let {
-        coords: { latitude: lat, longitude: lng },
-      } = await getCoordinates();
+        //Aktuelle Standortkoordinaten abfragen
+        let {
+          coords: { latitude: lat, longitude: lng },
+        } = await getCoordinates();
+
+        //Map auf Marker Zentrieren
+        this.map.flyTo({ center: [lng, lat], zoom: 12 });
 
         //Coordinaten werden eingesetzt!
         let standortDaten = await axios.get(
@@ -442,7 +444,6 @@ export default {
             }),
           );
         });
-
       } else {
         alert('Dieser Browser unterstützt die Abfrage der Geolocation nicht.');
       }
