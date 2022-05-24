@@ -122,7 +122,7 @@ export default {
       //Je nach Offline oder Onlinemode entscheiden und WebsocketPfad umbauen
 
       //WebsocketAdresse auf WSS ändern wenn HTTPS
-      if (window.location.protocol == 'https') {
+      if (!process.env.VUE_APP_WebSocketOfflineMode) {
         this.ws_serverAdress == `wss://localhost:${process.env.PORT}`;
       }
 
