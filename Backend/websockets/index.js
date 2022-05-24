@@ -35,8 +35,10 @@ function wsServer(httpServer) {
 
     //Wenn sich der User vom Websocket trennt
     ws.on('close', () => {
+      console.log(`User: ${connections.find((elem) => elem.ws == ws).email} left`);
+
       connections = connections.filter((elem) => elem.ws != ws);
-      console.log('User left');
+
       connections.forEach((elem) =>
         elem.ws.send(
           JSON.stringify({

@@ -104,97 +104,90 @@ export default {
     }
 
     //Wenn Nachrichten von Websocket kommen
-    this.ws.onmessage = (data) => {
+    this.ws.onmessage = ({ data:WebSocketMessageData }) => {
+      const { data, type } = JSON.parse(WebSocketMessageData);
       console.log(data)
-      
-      // const data1 = JSON.parse(data);
-      // console.log(data1)
-      
-      // const { data: bekommen } = JSON.parse(data1);
 
+      this.currentPos = data;
 
-      // console.log('Message bekommen: ', bekommen);
-
-      // this.currentPos = bekommen;
-
-      // //Messages von WS zu Admin
-      // if (bekommen.type == 'userLeft') {
-      //   //? user welcher gegangen ist entfernen
-      //   this.multiUser = this.multiUser.filter((elem) => elem.user.email != bekommen.payload);
-      // } else if (bekommen.type == 'Alarm') {
-      //   this.alarm = true;
-      //   this.interval = setInterval(() => {
-      //     if (this.color == 'white') this.color = 'red';
-      //     else this.color = 'white';
-      //   }, 500);
-      // } else {
-      //   //? Schauen ob der User schon vorhanden ist
-      //   let gefunden = this.multiUser.find((element) => element.user.email == bekommen.user.email);
-      //   //? Wenn noch nicht vorhanden pushen
-      //   if (!gefunden) {
-      //     //? Neuen User ins Array Pushen
-      //     this.multiUser.push({
-      //       user: bekommen.user,
-      //       adresse: bekommen.adresse,
-      //       lat: bekommen.lat,
-      //       lng: bekommen.lng,
-      //       markerFarbe: this.markerFarbe(),
-      //     });
-      //     //? Neuen Marker erstellen
-      //     const marker = new mapbox.Marker({
-      //       anchor: 'center',
-      //       color: this.markerFarbe(),
-      //     })
-      //       .setLngLat([bekommen.lng, bekommen.lat])
-      //       .addTo(this.map)
-      //       .setPopup(new mapbox.Popup().setHTML(`<p>Deine Position: ${bekommen.adresse} </p>`));
-      //     this.mapMarkerListe.push({ marker, user: bekommen.user });
-      //   } else {
-      //     this.multiUser.forEach((elem) => {
-      //       //? Schauen ob sich die Adresse gändert hat
-      //       if (elem.lat != bekommen.lat || elem.lng != bekommen.lng) {
-      //         //? Wenn sich die Werte geandert haben sie neu zuweisen
-      //         gefunden.adresse = bekommen.adresse;
-      //         gefunden.lat = bekommen.lat;
-      //         gefunden.lng = bekommen.lng;
-      //         //? Alten Marker vom user löschen
-      //         this.mapMarkerListe.forEach((elem) => {
-      //           //? Marker vom user finden
-      //           if (elem.user.email == gefunden.user.email) {
-      //             //? Index vom Obj mit user und marker finden
-      //             const userIndex = this.mapMarkerListe.findIndex(
-      //               (x) => x.user.email == bekommen.user.email,
-      //             );
-      //             //? marker aus Arry und Karte entfernen
-      //             this.mapMarkerListe.splice(userIndex, 1);
-      //             elem.marker.remove();
-      //             // //? Neuen marker erstellen
-      //             const marker = new mapbox.Marker({
-      //               anchor: 'center',
-      //               color: elem.markerFarbe,
-      //             })
-      //               .setLngLat([gefunden.lng, gefunden.lat])
-      //               .addTo(this.map)
-      //               .setPopup(
-      //                 new mapbox.Popup().setHTML(`<p>Deine Position: ${gefunden.adresse} </p>`),
-      //               ); // add popup
-      //             //? Neuen Marker mit User im Array speichern
-      //             this.mapMarkerListe.push({ marker, user: gefunden.user });
-      //           }
-      //         });
-      //       }
-      //     });
-      //   }
-      //   this.locationSingleUser = [
-      //     {
-      //       lat: bekommen.lat,
-      //       lng: bekommen.lng,
-      //       lable: 'Current Position User 1',
-      //     },
-      //   ];
-      //   this.lat = bekommen.lat;
-      //   this.long = bekommen.lng;
-      // }
+      //Messages von WS zu Admin
+      if (type == 'userLeft') {
+        //? user welcher gegangen ist entfernen
+        this.multiUser = this.multiUser.filter((elem) => elem.user.email != data.user.email);
+      } else if (type == 'Alarm') {
+        this.alarm = true;
+        this.interval = setInterval(() => {
+          if (this.color == 'white') this.color = 'red';
+          else this.color = 'white';
+        }, 500);
+      } else {
+        //? Schauen ob der User schon vorhanden ist
+        let gefunden = this.multiUser.find((element) => element.user.email == data.user.email);
+        //? Wenn noch nicht vorhanden pushen
+        if (!gefunden) {
+          //? Neuen User ins Array Pushen
+          this.multiUser.push({
+            user: data.user,
+            adresse: data.adresse,
+            lat: data.lat,
+            lng: data.lng,
+            markerFarbe: this.markerFarbe(),
+          });
+          //? Neuen Marker erstellen
+          const marker = new mapbox.Marker({
+            anchor: 'center',
+            color: this.markerFarbe(),
+          })
+            .setLngLat([data.lng, data.lat])
+            .addTo(this.map)
+            .setPopup(new mapbox.Popup().setHTML(`<p>Deine Position: ${data.adresse} </p>`));
+          this.mapMarkerListe.push({ marker, user: data.user });
+        } else {
+          this.multiUser.forEach((elem) => {
+            //? Schauen ob sich die Adresse gändert hat
+            if (elem.lat != data.lat || elem.lng != data.lng) {
+              //? Wenn sich die Werte geandert haben sie neu zuweisen
+              gefunden.adresse = data.adresse;
+              gefunden.lat = data.lat;
+              gefunden.lng = data.lng;
+              //? Alten Marker vom user löschen
+              this.mapMarkerListe.forEach((elem) => {
+                //? Marker vom user finden
+                if (elem.user.email == gefunden.user.email) {
+                  //? Index vom Obj mit user und marker finden
+                  const userIndex = this.mapMarkerListe.findIndex(
+                    (x) => x.user.email == data.user.email,
+                  );
+                  //? marker aus Arry und Karte entfernen
+                  this.mapMarkerListe.splice(userIndex, 1);
+                  elem.marker.remove();
+                  // //? Neuen marker erstellen
+                  const marker = new mapbox.Marker({
+                    anchor: 'center',
+                    color: elem.markerFarbe,
+                  })
+                    .setLngLat([gefunden.lng, gefunden.lat])
+                    .addTo(this.map)
+                    .setPopup(
+                      new mapbox.Popup().setHTML(`<p>Deine Position: ${gefunden.adresse} </p>`),
+                    ); // add popup
+                  //? Neuen Marker mit User im Array speichern
+                  this.mapMarkerListe.push({ marker, user: gefunden.user });
+                }
+              });
+            }
+          });
+        }
+        this.locationSingleUser = [
+          {
+            lat: data.lat,
+            lng: data.lng,
+            lable: 'Current Position User 1',
+          },
+        ];
+        this.lat = data.lat;
+        this.long = data.lng;
+      }
     };
   },
 
