@@ -1,4 +1,4 @@
-importScripts("/precache-manifest.bebfec3e6953755c2490cb65a8b1661a.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
+importScripts("/precache-manifest.a41d05a7528cf6a4673ae3c1a863d231.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 //Wichtige Imports oder Variablen
 
@@ -45,10 +45,10 @@ self.addEventListener('message', (event) => {
 
     case 'alarm':
       //TODO Alarm erstellen
-      console.log('Alarm im ServiceWorker')
+      console.log('Alarm im ServiceWorker');
 
       //Daten an den Websocket schicken
-      ws.send(JSON.stringify({ type: 'alarm', daten: payload}))
+      ws.send(JSON.stringify({ type: 'alarm', daten: payload }));
       break;
 
     case 'disconnect':

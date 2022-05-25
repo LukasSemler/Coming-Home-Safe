@@ -90,6 +90,8 @@ export default {
         'pk.eyJ1IjoiY29taW5naG9tZXNhZmUiLCJhIjoiY2wwN3RzZThnMDF3czNjbzFndnNrZ3h4OCJ9.xuaKaO_7XzSqiIBCAvcT7w',
       mapStyle: 'mapbox://styles/mapbox/streets-v11',
       mapMarkerListe: [],
+
+      
     };
   },
 
@@ -116,7 +118,6 @@ export default {
         //? user welcher gegangen ist entfernen
         this.multiUser = this.multiUser.filter((elem) => elem.user.email != data.user.email);
       } else if (type == 'alarm') {
-        alert('Alarm wurde ausgelöst');
         this.alarm = true;
         this.interval = setInterval(() => {
           if (this.color == 'white') this.color = 'red';
