@@ -41,6 +41,14 @@ self.addEventListener('message', (event) => {
 
       break;
 
+    case 'alarm':
+      //TODO Alarm erstellen
+      console.log('Alarm im ServiceWorker');
+
+      //Daten an den Websocket schicken
+      ws.send(JSON.stringify({ type: 'alarm', daten: payload }));
+      break;
+
     case 'disconnect':
       console.log('Disconnect');
       ws.close();

@@ -15,20 +15,36 @@ function wsServer(httpServer) {
     ws.on('message', (data) => {
       const { daten: positionData, type } = JSON.parse(data);
 
-      console.log('TYPEEEEEE: ' + type);
+      //console.log('TYPEEEEEE: ' + type);
+
+      if (type == 'alarm') {
+        console.log('ALARM----------------------------------------------------------------');
+      }
 
       //Auf Nachrichten richtig Reagieren
-      switch (type) {
-        case 'sendPosition':
-          console.log(`Nachrichtentyp: ${type} --> IM CASE`);
+      // switch (type) {
+      //   case 'sendPosition':
+      //     //console.log(`Nachrichtentyp: ${type} --> IM CASE`);
 
-          connections.forEach((elem) =>
-            elem.ws.send(JSON.stringify({ type: 'getPosition', data: positionData })),
-          );
-          break;
-        default:
-          console.log(`Nachrichtentyp: ${type} nicht defined (SWITCH IN websocket)`);
-          break;
+      //     connections.forEach((elem) =>
+      //       elem.ws.send(JSON.stringify({ type: 'getPosition', data: positionData })),
+      //     );
+      //     break;
+      //   default:
+      //     // console.log(`Nachrichtentyp: ${type} nicht defined (SWITCH IN websocket)`);
+      //     break;
+      // }
+
+      if (type == 'alarm') {
+        connections.forEach((elem) =>
+          elem.ws.send(JSON.stringify({ type: 'alarm', data: positionData })),
+        );
+      } else if (type == 'sendPosition') {
+        //console.log(`Nachrichtentyp: ${type} --> IM CASE`);
+
+        connections.forEach((elem) =>
+          elem.ws.send(JSON.stringify({ type: 'getPosition', data: positionData })),
+        );
       }
     });
 

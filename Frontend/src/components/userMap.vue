@@ -120,7 +120,6 @@ export default {
   methods: {
     //Mit WS Verbindung herstellen
     connectToWs() {
-
       //ServiceWorker sagen, dass er sich verbinden soll
       navigator.serviceWorker.ready.then((registration) => {
         registration.active.postMessage(
@@ -244,12 +243,15 @@ export default {
       }
       this.getRoute(coords);
 
-      const obj = {
-        type: 'Alarm',
-        user: this.$store.state.aktiverUser,
-      };
-
-      this.ws.send(JSON.stringify(obj));
+      // Alarm an ServiceWorker schicken
+      navigator.serviceWorker.ready.then((registration) => {
+        registration.active.postMessage(
+          JSON.stringify({
+            type: 'alarm',
+            payload: this.$store.state.aktiverUser,
+          }),
+        );
+      });
     },
 
     //Löscht alle Marker auf der Map

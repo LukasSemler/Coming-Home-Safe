@@ -104,9 +104,10 @@ export default {
     }
 
     //Wenn Nachrichten von Websocket kommen
-    this.ws.onmessage = ({ data:WebSocketMessageData }) => {
+    this.ws.onmessage = ({ data: WebSocketMessageData }) => {
       const { data, type } = JSON.parse(WebSocketMessageData);
-      console.log(data)
+      console.log('----->', data);
+      console.log('______>', type);
 
       this.currentPos = data;
 
@@ -114,7 +115,8 @@ export default {
       if (type == 'userLeft') {
         //? user welcher gegangen ist entfernen
         this.multiUser = this.multiUser.filter((elem) => elem.user.email != data.user.email);
-      } else if (type == 'Alarm') {
+      } else if (type == 'alarm') {
+        alert('Alarm wurde ausgelöst');
         this.alarm = true;
         this.interval = setInterval(() => {
           if (this.color == 'white') this.color = 'red';
