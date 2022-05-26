@@ -1,7 +1,5 @@
 <template>
-  <v-container>
-    <h2 class="text-center">Register</h2>
-    <br />
+  <v-container class="chs-register">
     <!-- Error Anzeigen -->
     <v-alert
       v-if="showError"
@@ -12,12 +10,17 @@
     >
       {{ errorText }}
     </v-alert>
-    <v-container class="grey lighten-2 rounded-lg">
+    <v-container class="chs-register">
+      <h2 class="text-center">Register</h2>
+      <p class="mt-4">
+        Falls Sie noch kein Konto bei uns haben, können Sie sich hier eines erstellen. Nachdem Sie
+        Ihr Konto erstellt haben, können Sie sich einfach anmelden und so unseren Dienst verweden
+      </p>
       <!--Eingabe-Form-->
       <v-form ref="form_Register" v-model="valid" lazy-validation>
         <v-container class="d-flex flex-wrap justify-center">
           <!--Vor-Nachname- Inputs-->
-          <v-col>
+          <v-col class="chs-card">
             <!--MeinSpalte wo Inputs liegen-->
             <v-row class="justify-center">
               <v-col md="4">
@@ -151,7 +154,7 @@
                   solo
                   name="interessen"
                   label="Geben Sie persönliche Interessen oder Hobbys an"
-                  background-color="grey lighten-2"
+                  background-color="grey lighten-4"
                 ></v-textarea>
               </v-col>
             </v-row>
@@ -179,7 +182,7 @@
               <v-dialog v-model="dialog" persistent max-width="500px">
                 <template v-slot:activator="{ on, attrs }">
                   <!--Register-Button-->
-                  <v-btn color="primary" v-bind="attrs" @click="openOTP(on)"> Register </v-btn>
+                  <v-btn color="chs-button" v-bind="attrs" @click="openOTP(on)"> Register </v-btn>
                 </template>
                 <v-card>
                   <v-card-title>
@@ -210,7 +213,6 @@ export default {
   name: 'Register',
   data() {
     return {
-
       //Inputvariablen
       Vorname: '',
       Nachname: '',
@@ -382,5 +384,30 @@ export default {
 <style>
 .pointer:hover {
   cursor: pointer;
+}
+.chs-card {
+  padding-top: 3rem;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  max-width: 60rem;
+}
+.chs-button {
+  background-color: rgba(255, 0, 0, 0) !important;
+  box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14),
+    0px 0px 0px 0px rgba(0, 0, 0, 0.12) !important;
+  border: 2px solid #000000;
+  border-radius: 20px;
+}
+.chs-button:hover {
+  background-color: rgb(0, 0, 0) !important;
+  color: white !important;
+  transition: all 0.5s;
+}
+.chs-register {
+  background-color: rgba(255, 255, 255, 0);
 }
 </style>

@@ -35,7 +35,7 @@
         <v-container>
           <v-row class="justify-center">
             <v-col md="12" class="chs-card">
-              <h2 class="text-left">Login</h2>
+              <h2 class="text-left mb-4">Login</h2>
               <!--Email-->
               <v-row class="justify-center">
                 <v-col md="12">
