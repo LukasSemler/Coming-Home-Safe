@@ -11,6 +11,10 @@ function wsServer(httpServer) {
 
     connections.push({ ws, email });
 
+    connections.forEach((elem) => {
+      elem.ws.send(JSON.stringify({ type: 'newConnection', data: email }));
+    });
+
     //Wenn der WebsocketServer Nachrichten bekommt
     ws.on('message', (data) => {
       const { daten: positionData, type } = JSON.parse(data);
@@ -20,20 +24,6 @@ function wsServer(httpServer) {
       if (type == 'alarm') {
         console.log('ALARM----------------------------------------------------------------');
       }
-
-      //Auf Nachrichten richtig Reagieren
-      // switch (type) {
-      //   case 'sendPosition':
-      //     //console.log(`Nachrichtentyp: ${type} --> IM CASE`);
-
-      //     connections.forEach((elem) =>
-      //       elem.ws.send(JSON.stringify({ type: 'getPosition', data: positionData })),
-      //     );
-      //     break;
-      //   default:
-      //     // console.log(`Nachrichtentyp: ${type} nicht defined (SWITCH IN websocket)`);
-      //     break;
-      // }
 
       if (type == 'alarm') {
         connections.forEach((elem) =>
@@ -52,8 +42,7 @@ function wsServer(httpServer) {
     ws.on('close', () => {
       console.log(`User: ${connections.find((elem) => elem.ws == ws).email} left`);
 
-      connections = connections.filter((elem) => elem.ws != ws);
-
+      // den anderen Verbindeungen sagen das ein User gegangen ist
       connections.forEach((elem) =>
         elem.ws.send(
           JSON.stringify({
@@ -62,6 +51,9 @@ function wsServer(httpServer) {
           }),
         ),
       );
+
+      // User aus dem Array löschen
+      connections = connections.filter((elem) => elem.ws != ws);
     });
   });
 }

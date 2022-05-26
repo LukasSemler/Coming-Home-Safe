@@ -54,6 +54,11 @@ self.addEventListener('message', (event) => {
       ws.close();
 
       break;
+
+    case 'newConnection':
+      console.log('Neuer User');
+
+      break;
   }
 });
 

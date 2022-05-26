@@ -410,7 +410,7 @@ export default {
         } = await getCoordinates();
 
         //Map auf Marker Zentrieren
-        this.map.flyTo({ center: [lng, lat], zoom: 12 });
+        this.map.flyTo({ center: [lng, lat], zoom: 15 });
 
         //Coordinaten werden eingesetzt!
         let standortDaten = await axios.get(

@@ -1,4 +1,4 @@
-importScripts("/precache-manifest.a41d05a7528cf6a4673ae3c1a863d231.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
+importScripts("/precache-manifest.a3a96228014932c12fdd0c4decb9d2ae.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 //Wichtige Imports oder Variablen
 
@@ -54,6 +54,11 @@ self.addEventListener('message', (event) => {
     case 'disconnect':
       console.log('Disconnect');
       ws.close();
+
+      break;
+
+    case 'newConnection':
+      console.log('Neuer User');
 
       break;
   }

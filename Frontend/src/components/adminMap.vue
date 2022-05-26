@@ -90,8 +90,6 @@ export default {
         'pk.eyJ1IjoiY29taW5naG9tZXNhZmUiLCJhIjoiY2wwN3RzZThnMDF3czNjbzFndnNrZ3h4OCJ9.xuaKaO_7XzSqiIBCAvcT7w',
       mapStyle: 'mapbox://styles/mapbox/streets-v11',
       mapMarkerListe: [],
-
-      
     };
   },
 
@@ -108,21 +106,34 @@ export default {
     //Wenn Nachrichten von Websocket kommen
     this.ws.onmessage = ({ data: WebSocketMessageData }) => {
       const { data, type } = JSON.parse(WebSocketMessageData);
-      console.log('----->', data);
-      console.log('______>', type);
 
       this.currentPos = data;
 
       //Messages von WS zu Admin
       if (type == 'userLeft') {
-        //? user welcher gegangen ist entfernen
-        this.multiUser = this.multiUser.filter((elem) => elem.user.email != data.user.email);
+        //Marker entfernen
+        this.mapMarkerListe.forEach((elem) => {
+          //? Marker vom user finden
+          if (elem.user.email == data) {
+            //? Index vom Obj mit user und marker finden
+            const userIndex = this.mapMarkerListe.findIndex((x) => x.user.email == data);
+            //? marker aus Arry und Karte entfernen
+            this.mapMarkerListe.splice(userIndex, 1);
+            elem.marker.remove();
+          }
+        });
+
+        // User aus dem Array löschen
+        this.multiUser = this.multiUser.filter((elem) => elem.user.email != data);
+        this.mapMarkerListe = this.mapMarkerListe.filter((elem) => elem.user.email != data);
       } else if (type == 'alarm') {
         this.alarm = true;
         this.interval = setInterval(() => {
           if (this.color == 'white') this.color = 'red';
           else this.color = 'white';
         }, 500);
+      } else if (type == 'newConnection') {
+        console.log('Neuer User');
       } else {
         //? Schauen ob der User schon vorhanden ist
         let gefunden = this.multiUser.find((element) => element.user.email == data.user.email);

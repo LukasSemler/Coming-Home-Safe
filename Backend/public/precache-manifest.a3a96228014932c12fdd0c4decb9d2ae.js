@@ -1,11 +1,11 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "c5fd73fdada3c311e93733813704e986",
-    "url": "/Sounds/NBUK26X-alarm.mp3"
+    "url": "/Sound/NBUK26X-alarm.mp3"
   },
   {
-    "revision": "b5b9f34154edef5573d9",
-    "url": "/css/app.e586ddd7.css"
+    "revision": "39c745757fea584bebd1",
+    "url": "/css/app.26ccce4f.css"
   },
   {
     "revision": "1400802731cc3b1f4ed1",
@@ -16,12 +16,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/img/background.svg"
   },
   {
-    "revision": "79a28a26c796ea246cb488f93dff0223",
+    "revision": "4fe7c8dfc8dbbcf48e9e71a014ec54a4",
     "url": "/index.html"
   },
   {
-    "revision": "b5b9f34154edef5573d9",
-    "url": "/js/app.f44728d0.js"
+    "revision": "39c745757fea584bebd1",
+    "url": "/js/app.7aaa13b9.js"
   },
   {
     "revision": "1400802731cc3b1f4ed1",
