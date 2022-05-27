@@ -2,9 +2,6 @@
   <v-container>
     <v-container class="mb-5">
       <h2 class="text-center">Track Position</h2>
-
-      <v-btn class="chs-button-red" @click="PlaySound">Click me to Play a Sound</v-btn>
-      <v-btn class="chs-button-red" @click="StopSound">Click me to Stop the Sound</v-btn>
     </v-container>
 
     <!--Map-->
@@ -168,6 +165,15 @@ export default {
     //Näheste Polizeistation aufsuchen und Route setzen
     sendAlarm() {
       if (this.alarmStarted) return;
+
+      // Sound abspielen
+      // this.playSound = new Audio('/Sound/NBUK26X-alarm.mp3');
+      // this.playSound.volume = 1.0;
+      // this.playSound.loop = true;
+      // this.playSound.play();
+
+      this.PlaySound();
+
       this.alarmStarted = true;
       const start = [this.centerPosition.lng, this.centerPosition.lat];
       //Für Route:
@@ -316,6 +322,12 @@ export default {
         //Tracker-Intervall starten
         this.trackIntervall = setInterval(this.track, 1000);
       } else {
+        //Sound pausieren
+        if (this.alarmStarted) {
+          this.playSound.pause();
+          this.playSound = null;
+        }
+
         //Marker löschen
         this.deleteAllMarkers();
 
