@@ -473,6 +473,9 @@ export default {
             }),
           );
         });
+
+        //Standort zu der Datenbank senden
+        await axios.post('/sendPosition', position);
       } else {
         alert('Dieser Browser unterstützt die Abfrage der Geolocation nicht.');
       }

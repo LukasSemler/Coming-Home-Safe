@@ -6,6 +6,7 @@ const {
   getUsersfromDB,
   changeAdmin,
   ChangeUserPassword,
+  sendPositionDB,
 } = require('../globaleDinge');
 
 //Kunden den Auth-Code senden
@@ -111,6 +112,14 @@ const ChangePasswortHandler = async (req, res) => {
   }
 };
 
+const sendPosition = async (req, res) => {
+  const position = req.body;
+
+  await sendPositionDB(position);
+
+  res.status(200).send('Success');
+};
+
 module.exports = {
   SendAuthCodeHandler,
   RegisterIntoDatabaseHandler,
@@ -119,4 +128,5 @@ module.exports = {
   getUsersHandler,
   PatchAdminHandler,
   ChangePasswortHandler,
+  sendPosition,
 };

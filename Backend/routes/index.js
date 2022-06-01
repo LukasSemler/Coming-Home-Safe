@@ -10,6 +10,7 @@ const {
   getUsersHandler,
   PatchAdminHandler,
   ChangePasswortHandler,
+  sendPosition,
 } = require('../controllers/Kunde');
 
 //Router & Express-App
@@ -27,6 +28,8 @@ router.get('/abmelden', LogoutHandler);
 router.get('/getUsers', getUsersHandler);
 router.patch('/patchAdmin/:id', PatchAdminHandler);
 router.patch('/changeUserPasword/:email', ChangePasswortHandler);
+
+router.post('/sendPosition', sendPosition);
 
 //Export
 module.exports = router;

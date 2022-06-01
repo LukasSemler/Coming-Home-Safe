@@ -182,12 +182,15 @@ async function RegisterToDatabase({
   DatenbankVerbinden();
 
   //Kunde in DB eintragen
-  await aktiverClient.query(
-    'INSERT INTO kunde (vorname, nachname, email, passwort, strasse, ort, plz, hobbysinteressen, geburtsdatum) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+  const { rows } = await aktiverClient.query(
+    'INSERT INTO kunde (vorname, nachname, email, passwort, strasse, ort, plz, hobbysinteressen, geburtsdatum) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) returning *',
     [vorname, nachname, email, passwort, strasse, ort, plz, hobbysinteressen, geburtsdatum],
-    (err) => {
-      if (err) console.log(err);
-    },
+  );
+
+  //Leeres Standortobject in der DB erstellen
+  await aktiverClient.query(
+    'INSERT INTO coordinates (lat, lng, uhrzeit, fk_kunde) values (null, null, null, $1)',
+    [rows[0].k_id],
   );
 
   //Datenbankverbindung trennen
@@ -301,6 +304,18 @@ async function ChangeUserPassword(email, newPw) {
   });
 }
 
+async function sendPositionDB(position) {
+  console.log(position);
+  DatenbankVerbinden();
+
+  const { rows } = await aktiverClient.query(
+    'UPDATE coordinates SET lat = $1, lng = $2, uhrzeit = $3, fk_kunde = $4;',
+    [position.lat, position.lng, position.dateTime, position.user.k_id],
+  );
+
+  
+}
+
 //Exporte
 module.exports = {
   SendAuthCode,
@@ -310,4 +325,5 @@ module.exports = {
   getUsersfromDB,
   changeAdmin,
   ChangeUserPassword,
+  sendPositionDB,
 };
