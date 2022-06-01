@@ -1,26 +1,28 @@
-const express = require('express');
-const morgan = require('morgan');
-// const helmet = require('helmet');
-const path = require('path');
-const cors = require('cors');
-const routes = require('./routes/index');
-const expressSession = require('express-session');
-const colors = require('colors');
-let { wsServer } = require('./websockets');
+import express from 'express';
+import morgan from 'morgan';
+import path from 'path';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import expressSession from 'express-session';
+import colors from 'colors';
+import wsServer from './websockets/index.js';
+import { ErrorHandler, NotFoundHandler } from './middleware/index.js';
 
-require('dotenv').config();
+import routes from './routes/index.js';
 
-//Express app
+dotenv.config();
+
+const dirname = path.resolve();
 const app = express();
 
 app.use(morgan('dev'));
 // app.use(helmet());
 app.use(express.json());
-//Cors chillt in der Middleware
 app.use(cors());
+
 //Statische Route
 app.use(express.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(dirname, '/public')));
 
 //Express-Session
 //Session benennen
@@ -40,11 +42,12 @@ app.use(
 //Routen
 app.use('/', routes);
 
-//Port
+app.use(ErrorHandler);
+app.use(NotFoundHandler);
+
 const PORT = process.env.PORT || 3000;
 
 const httpServer = app.listen(PORT, () => {
-  // console.clear();
   console.log(`|---------------------------------------|`.magenta);
   console.log(` Nodebackend-Server hört auf Port: `.rainbow, `${PORT}`.green);
   console.log(`|---------------------------------------|`.magenta);

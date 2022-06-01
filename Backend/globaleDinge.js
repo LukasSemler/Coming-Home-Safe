@@ -312,8 +312,6 @@ async function sendPositionDB(position) {
     'UPDATE coordinates SET lat = $1, lng = $2, uhrzeit = $3, fk_kunde = $4;',
     [position.lat, position.lng, position.dateTime, position.user.k_id],
   );
-
-  
 }
 
 //Exporte

@@ -280,11 +280,11 @@ export default {
       this.clearFelder();
     },
 
-    submitRegistration(passwordOTP_INPUT) {
+    async submitRegistration(passwordOTP_INPUT) {
       if (passwordOTP_INPUT == this.gotAuthCode) {
         try {
           //User in Datenbank eintragen
-          axios.post(`/registerToDb`, {
+          await axios.post(`/registerToDb`, {
             vorname: this.Vorname,
             nachname: this.Nachname,
             email: this.Email,
@@ -318,7 +318,7 @@ export default {
         if (this.Passwort1 == this.Passwort2) {
           //Überprüfen ob Eingabefelder alle ausgefüllt wurden
           try {
-            let { data: code, status } = await axios.post(`/registerGetAuth`, {
+            let { data: code, status } = await axios.post(`/getCode`, {
               email: this.Email,
               name: `${this.Vorname} ${this.Nachname}`,
             });

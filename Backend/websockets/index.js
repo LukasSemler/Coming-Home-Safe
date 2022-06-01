@@ -1,10 +1,10 @@
-const Websocket = require('ws');
+import { WebSocketServer } from 'ws';
 
 //WebsocketVariablen
 let connections = [];
 
 function wsServer(httpServer) {
-  const wss = new Websocket.Server({ server: httpServer });
+  const wss = new WebSocketServer({ server: httpServer });
   wss.on('connection', (ws) => {
     let email = ws._protocol;
     email = email.replace('|', '@');
@@ -60,6 +60,6 @@ function wsServer(httpServer) {
 
 setInterval(() => {
   console.log('Länge: ' + connections.length);
-}, 1000);
+}, 3000);
 
-module.exports = { wsServer };
+export default wsServer;

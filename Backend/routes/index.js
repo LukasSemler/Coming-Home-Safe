@@ -1,17 +1,20 @@
 //Required Dinge
-const express = require('express');
+import express from 'express';
+import AsyncHandler from 'express-async-handler';
+
+import { register } from '../controllers/user.js';
 
 //Routenhandler
-const {
-  SendAuthCodeHandler,
-  RegisterIntoDatabaseHandler,
-  LoginHandler,
-  LogoutHandler,
-  getUsersHandler,
-  PatchAdminHandler,
-  ChangePasswortHandler,
-  sendPosition,
-} = require('../controllers/Kunde');
+// const {
+//   SendAuthCodeHandler,
+//   RegisterIntoDatabaseHandler,
+//   LoginHandler,
+//   LogoutHandler,
+//   getUsersHandler,
+//   PatchAdminHandler,
+//   ChangePasswortHandler,
+//   sendPosition,
+// } = require('../controllers/Kunde');
 
 //Router & Express-App
 const router = express.Router();
@@ -20,16 +23,18 @@ const router = express.Router();
 router.get('/', (req, res) => res.status(200).send('MainSeite!'));
 
 //Kundenrouten
-router.post('/registerGetAuth', SendAuthCodeHandler);
-router.post('/registerToDb', RegisterIntoDatabaseHandler);
-router.post('/login', LoginHandler);
-router.get('/abmelden', LogoutHandler);
+// router.post('/registerGetAuth', SendAuthCodeHandler);
+// router.post('/registerToDb', RegisterIntoDatabaseHandler);
+// router.post('/login', LoginHandler);
+// router.get('/abmelden', LogoutHandler);
 
-router.get('/getUsers', getUsersHandler);
-router.patch('/patchAdmin/:id', PatchAdminHandler);
-router.patch('/changeUserPasword/:email', ChangePasswortHandler);
+// router.get('/getUsers', getUsersHandler);
+// router.patch('/patchAdmin/:id', PatchAdminHandler);
+// router.patch('/changeUserPasword/:email', ChangePasswortHandler);
 
-router.post('/sendPosition', sendPosition);
+// router.post('/sendPosition', sendPosition);
+
+router.get('/getCode', AsyncHandler(register));
 
 //Export
-module.exports = router;
+export default router;

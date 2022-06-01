@@ -1,5 +1,5 @@
 ############ Authentification senden
-POST http://localhost:2410/registerGetAuth
+POST http://localhost:2410/getCode
 Content-Type: application/json
 
 {
