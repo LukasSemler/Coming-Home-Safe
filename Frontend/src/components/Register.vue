@@ -284,7 +284,7 @@ export default {
       if (passwordOTP_INPUT == this.gotAuthCode) {
         try {
           //User in Datenbank eintragen
-          await axios.post(`/registerToDb`, {
+          await axios.post(`/register`, {
             vorname: this.Vorname,
             nachname: this.Nachname,
             email: this.Email,

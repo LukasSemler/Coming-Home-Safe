@@ -4,21 +4,21 @@ Content-Type: application/json
 
 {
     "name": "Benjamin Stauf",
-    "email": "benjamin@stauf.at"
+    "email": "semler.l04@htlwienwest.at"
 }
 
 ############## Registrieren
-POST http://localhost:2410/registerToDb
+POST http://localhost:2410/register
 Content-Type: application/json
 
 {
     "vorname": "benjamin",
     "nachname": "stauf",
-    "email": "benjamin@stauf.at",
-    "passwort": "testPW",
+    "email": "semler.l04@htlwienwest.at",
+    "passwort": "Lukas",
     "strasse": "Steinlegasse 38/3",
     "ort": "Wien", 
-    "plz": 1160,  
+    "plz": "1160",  
     "hobbysinteressen": "öasdklasödkölaskdsöakldalsöd", 
     "geburtsdatum": "2003-10-24"
 }

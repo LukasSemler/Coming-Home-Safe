@@ -1,5 +1,49 @@
-import { checkIfUserExists } from '../Models/user.js';
+import { checkIfUserExists, registerUser } from '../Models/user.js';
+import validator from 'is-my-json-valid';
 import sendCode from '../Mail/mail.js';
+
+const validateUser = validator({
+  required: true,
+  type: 'object',
+  properties: {
+    vorname: {
+      required: true,
+      type: 'string',
+    },
+    nachname: {
+      required: true,
+      type: 'string',
+    },
+    email: {
+      required: true,
+      type: 'string',
+    },
+    passwort: {
+      required: true,
+      type: 'string',
+    },
+    strasse: {
+      required: true,
+      type: 'string',
+    },
+    plz: {
+      required: true,
+      type: 'string',
+    },
+    ort: {
+      required: true,
+      type: 'string',
+    },
+    hobbysinteressen: {
+      require: true,
+      type: 'string',
+    },
+    geburtsdatum: {
+      require: true,
+      type: 'string',
+    },
+  },
+});
 
 //Generiert einen Authentifikations-Code
 let makeAuthCode = () => {
@@ -14,7 +58,7 @@ let makeAuthCode = () => {
   return code;
 };
 
-const register = async (req, res) => {
+const getCode = async (req, res) => {
   const { email, name } = req.body;
 
   //Schauen ob der User schon in der DB vorhanden ist
@@ -27,12 +71,17 @@ const register = async (req, res) => {
   const code = makeAuthCode();
 
   //Code an den User schicken
-  const success = await sendCode(code, email, name);
-
-  // Schauen ob das Senden von Code erfolgreich war
-  if (success) return res.status(200).send(code);
-
-  return res.status(500).send('Es ist ein Fehler beim Code senden aufgetreten');
+  sendCode(code, email, name, res);
 };
 
-export { register };
+const register = async (req, res) => {
+  if (!validateUser(req.body)) return res.status(400).send(validateUser.error);
+
+  const result = await registerUser(req.body);
+
+  if (!result) return res.status(500).send('Fehler beim Registrieren');
+
+  return res.status(200).json(result);
+};
+
+export { getCode, register };

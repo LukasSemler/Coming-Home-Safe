@@ -58,8 +58,8 @@ function wsServer(httpServer) {
   });
 }
 
-setInterval(() => {
-  console.log('Länge: ' + connections.length);
-}, 3000);
+// setInterval(() => {
+//   console.log('Länge: ' + connections.length);
+// }, 3000);
 
 export default wsServer;

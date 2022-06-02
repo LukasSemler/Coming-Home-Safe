@@ -39,7 +39,7 @@ const smtpTransport = nodemailer.createTransport({
   },
 });
 
-async function SendAuthCodePerMail(genCode, empfängerMail, name) {
+async function SendAuthCodePerMail(genCode, empfängerMail, name, res) {
   //Nodemailer smtpTransport erstellen
 
   //Configure Handlebar ------> PFAD MACHT PROBLEME!!!!!
@@ -80,11 +80,11 @@ async function SendAuthCodePerMail(genCode, empfängerMail, name) {
     if (error) {
       console.log('Error beim Mail senden: ', error);
       smtpTransport.close();
-      return false;
+      res.status(500).send('Error beim Mail senden: ', error);
     } else {
       console.log('Success beim Mail senden');
       smtpTransport.close();
-      return true;
+      res.status(200).send(genCode);
     }
   });
 }

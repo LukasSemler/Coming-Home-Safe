@@ -2,7 +2,7 @@
 import express from 'express';
 import AsyncHandler from 'express-async-handler';
 
-import { register } from '../controllers/user.js';
+import { getCode, register } from '../controllers/user.js';
 
 //Routenhandler
 // const {
@@ -34,7 +34,8 @@ router.get('/', (req, res) => res.status(200).send('MainSeite!'));
 
 // router.post('/sendPosition', sendPosition);
 
-router.get('/getCode', AsyncHandler(register));
+router.post('/getCode', AsyncHandler(getCode));
+router.post('/register', AsyncHandler(register));
 
 //Export
 export default router;
