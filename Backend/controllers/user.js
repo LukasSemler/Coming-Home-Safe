@@ -1,4 +1,4 @@
-import { checkIfUserExists, registerUser } from '../Models/user.js';
+import { checkIfUserExists, registerUser, loginUser } from '../Models/user.js';
 import validator from 'is-my-json-valid';
 import sendCode from '../Mail/mail.js';
 
@@ -84,4 +84,20 @@ const register = async (req, res) => {
   return res.status(200).json(result);
 };
 
-export { getCode, register };
+const login = async (req, res) => {
+  console.log(req.body);
+  const { email, passwort } = req.body;
+
+  const result = await loginUser(email, passwort);
+
+  //Schauen ob der User ein Admin ist, wenn ja Mail schicken, sonst normal anmelden
+  if (result.isAdmin) {
+    const code = makeAuthCode();
+    return sendCode(code, email, `${result.vorname} ${result.nachname}`, code, res, result);
+  } else if (!result.isAdmin)
+    return res.status(200).send(JSON.stringify({ foundUser: result, code: 'kein Admin' }));
+
+  return res.status(500).send('Fehler beim Login');
+};
+
+export { getCode, register, login };
