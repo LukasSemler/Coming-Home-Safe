@@ -90,10 +90,12 @@ const login = async (req, res) => {
 
   const result = await loginUser(email, passwort);
 
+
   //Schauen ob der User ein Admin ist, wenn ja Mail schicken, sonst normal anmelden
-  if (result.isAdmin) {
+  if (result.isadmin) {
     const code = makeAuthCode();
-    return sendCode(code, email, `${result.vorname} ${result.nachname}`, code, res, result);
+    sendCode(code, email, `${result.vorname} ${result.nachname}`, code, res, result);
+    return res.status(200).send(JSON.stringify({ foundUser: result, code: code }));
   } else if (!result.isAdmin)
     return res.status(200).send(JSON.stringify({ foundUser: result, code: 'kein Admin' }));
 
