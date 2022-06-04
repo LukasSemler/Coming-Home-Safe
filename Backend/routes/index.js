@@ -2,7 +2,7 @@
 import express from 'express';
 import AsyncHandler from 'express-async-handler';
 
-import { getCode, register, login } from '../controllers/user.js';
+import { getCode, register, login, abmelden } from '../controllers/user.js';
 
 //Routenhandler
 // const {
@@ -37,6 +37,7 @@ router.post('/getCode', AsyncHandler(getCode));
 router.post('/register', AsyncHandler(register));
 
 router.post('/login', AsyncHandler(login));
+router.get('/abmelden', AsyncHandler(abmelden));
 
 //Export
 export default router;

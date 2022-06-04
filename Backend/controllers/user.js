@@ -90,7 +90,6 @@ const login = async (req, res) => {
 
   const result = await loginUser(email, passwort);
 
-
   //Schauen ob der User ein Admin ist, wenn ja Mail schicken, sonst normal anmelden
   if (result.isadmin) {
     const code = makeAuthCode();
@@ -102,4 +101,10 @@ const login = async (req, res) => {
   return res.status(500).send('Fehler beim Login');
 };
 
-export { getCode, register, login };
+const abmelden = (req, res) => {
+  req.session.destroy();
+  res.clearCookie('comingHomeSave');
+  res.end();
+};
+
+export { getCode, register, login, abmelden };
