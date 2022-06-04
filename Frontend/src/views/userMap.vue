@@ -109,7 +109,7 @@ export default {
 
     async changePassword() {
       if (this.changePw_Password_1 == this.changePw_Password_2) {
-        let { data: dataText, status } = await axios.patch(
+        let { status } = await axios.patch(
           `/changeUserPassword/${this.$store.state.aktiverUser.email}`,
           { newPw: this.changePw_Password_1 },
         );

@@ -81,4 +81,14 @@ const changePasswordDB = async (email, password) => {
   }
 };
 
-export { checkIfUserExists, registerUser, loginUser, changePasswordDB };
+async function sendPositionDB(position) {
+  console.log(position);
+  DatenbankVerbinden();
+
+  const { rows } = await aktiverClient.query(
+    'UPDATE coordinates SET lat = $1, lng = $2, uhrzeit = $3, fk_kunde = $4;',
+    [position.lat, position.lng, position.dateTime, position.user.k_id],
+  );
+}
+
+export { checkIfUserExists, registerUser, loginUser, changePasswordDB, sendPositionDB };

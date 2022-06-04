@@ -118,4 +118,12 @@ const changePasswort = async (req, res) => {
   return res.status(200).send('Passwort wurde erfolgreich geändert');
 };
 
-export { getCode, register, login, abmelden, changePasswort };
+const sendPosition = async (req, res) => {
+  const position = req.body;
+
+  await sendPositionDB(position);
+
+  res.status(200).send('Success');
+};
+
+export { getCode, register, login, abmelden, changePasswort, sendPosition };
