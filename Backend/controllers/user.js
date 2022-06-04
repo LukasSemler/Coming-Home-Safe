@@ -1,4 +1,4 @@
-import { checkIfUserExists, registerUser, loginUser } from '../Models/user.js';
+import { checkIfUserExists, registerUser, loginUser, changePasswordDB } from '../Models/user.js';
 import validator from 'is-my-json-valid';
 import sendCode from '../Mail/mail.js';
 
@@ -107,4 +107,15 @@ const abmelden = (req, res) => {
   res.end();
 };
 
-export { getCode, register, login, abmelden };
+const changePasswort = async (req, res) => {
+  const { email } = req.params;
+  const { newPw } = req.body;
+
+  const result = await changePasswordDB(email, newPw);
+
+  if (!result) return res.status(500).send('Fehler beim ändern vom Passwort');
+
+  return res.status(200).send('Passwort wurde erfolgreich geändert');
+};
+
+export { getCode, register, login, abmelden, changePasswort };

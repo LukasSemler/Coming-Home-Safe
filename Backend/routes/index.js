@@ -2,7 +2,7 @@
 import express from 'express';
 import AsyncHandler from 'express-async-handler';
 
-import { getCode, register, login, abmelden } from '../controllers/user.js';
+import { getCode, register, login, abmelden, changePasswort } from '../controllers/user.js';
 
 //Routenhandler
 // const {
@@ -23,8 +23,6 @@ const router = express.Router();
 router.get('/', (req, res) => res.status(200).send('MainSeite!'));
 
 //Kundenrouten
-// router.post('/login', LoginHandler);
-// router.get('/abmelden', LogoutHandler);
 
 // router.get('/getUsers', getUsersHandler);
 // router.patch('/patchAdmin/:id', PatchAdminHandler);
@@ -38,6 +36,8 @@ router.post('/register', AsyncHandler(register));
 
 router.post('/login', AsyncHandler(login));
 router.get('/abmelden', AsyncHandler(abmelden));
+
+router.patch('/changeUserPassword/:email', AsyncHandler(changePasswort));
 
 //Export
 export default router;

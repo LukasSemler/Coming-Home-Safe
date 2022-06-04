@@ -57,4 +57,28 @@ const loginUser = async (email, password) => {
   return false;
 };
 
-export { checkIfUserExists, registerUser, loginUser };
+const changePasswordDB = async (email, password) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const { rows } = await client.query('SELECT * FROM kunde WHERE email = $1', [email]);
+
+    if (!rows[0]) false;
+
+    const { rows: change } = await client.query(
+      'UPDATE kunde SET passwort = $1 where email= $2 returning *; ',
+      [password, email],
+    );
+
+    await client.query('COMMIT');
+    return change[0];
+  } catch (error) {
+    console.log(error);
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
+export { checkIfUserExists, registerUser, loginUser, changePasswordDB };

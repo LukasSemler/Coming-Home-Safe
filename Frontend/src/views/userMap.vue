@@ -1,5 +1,4 @@
 <template>
-
   <v-container>
     <!--UserInteraktionen-->
     <v-row>
@@ -111,19 +110,19 @@ export default {
     async changePassword() {
       if (this.changePw_Password_1 == this.changePw_Password_2) {
         let { data: dataText, status } = await axios.patch(
-          `/changeUserPasword/${this.$store.state.aktiverUser.email}`,
+          `/changeUserPassword/${this.$store.state.aktiverUser.email}`,
           { newPw: this.changePw_Password_1 },
         );
 
         //Feedback-Alert
         if (status == 200) {
           this.changePw_Alert_Color = 'green';
-          this.changePw_Alert_Text = dataText;
+          this.changePw_Alert_Text = 'Passwort wurde erfolgreich geändert !';
           this.changePw_Alert_Type = 'success';
           this.changePw_Alert_Show = true;
         } else {
           this.changePw_Alert_Color = 'red';
-          this.changePw_Alert_Text = dataText;
+          this.changePw_Alert_Text = 'Es ist ein Fehler beim Ändern vom Passwort aufgetreten';
           this.changePw_Alert_Type = 'error';
           this.changePw_Alert_Show = true;
         }
